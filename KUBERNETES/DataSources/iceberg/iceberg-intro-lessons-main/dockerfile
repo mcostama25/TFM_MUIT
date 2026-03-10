@@ -1,0 +1,9 @@
+FROM eclipse-temurin:11-jre
+
+WORKDIR /opt/iceberg
+
+COPY ../iceberg/iceberg-rest-catalog-all.jar /opt/iceberg/
+
+EXPOSE 8181
+
+CMD ["java", "-cp", "/opt/iceberg/iceberg-rest-catalog-all.jar", "org.apache.iceberg.rest.RESTCatalogServer"]

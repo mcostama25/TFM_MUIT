@@ -1,0 +1,10 @@
+source:
+  type: openapi
+  config:
+    name: "DataEU_OpenAPI"
+    swagger_file: "/openapi.yaml"
+    url: "https://data.europa.eu/api/hub/search"
+sink:
+  type: datahub-rest
+  config:
+    server: "http://datahub-datahub-gms:8080" # port de Localhost a GMS /DataHub2

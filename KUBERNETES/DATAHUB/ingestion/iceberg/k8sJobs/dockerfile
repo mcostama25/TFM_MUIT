@@ -1,0 +1,18 @@
+FROM python:3.10-slim
+
+# Instal·lar dependències del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instal·lar DataHub amb el connector Iceberg
+RUN pip install --upgrade pip && \
+    pip install \
+        'acryl-datahub[iceberg]==0.13.1' \
+        'pyiceberg[nessie, pyarrow]==0.7.1'
+# Crear directori per receptes
+RUN mkdir -p /etc/recipes
+
+# Entrypoint per defecte
+ENTRYPOINT ["datahub"]

@@ -1,0 +1,23 @@
+source:
+  type: "iceberg"
+  config:
+    catalog:
+      default:
+        catalog_type: rest
+        uri: "http://localhost:19120/api/v2"
+        warehouse_path: "file:///home/ibdn/TFM/iceberg_warehouse/default"
+        ref: "main"
+        authentication_type: "NONE"
+        properties:
+          py-io-impl: "pyiceberg.io.pyarrow.PyArrowFileIO"
+    platform_instance: "default"
+    table_pattern:
+      allow:
+        - ".*"
+    profiling:
+      enabled: false
+sink:
+  type: "datahub-rest"
+  config:
+    server: "http://localhost:8080"
+    token: "${DATAHUB_TOKEN}"

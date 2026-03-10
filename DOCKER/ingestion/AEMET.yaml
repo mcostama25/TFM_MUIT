@@ -1,0 +1,11 @@
+source:
+  type: openapi
+  config:
+    name: "AEMET_OpenAPI"
+    swagger_file: "/AEMET_OpenData_specification.json"
+    url: "https://opendata.aemet.es"
+    bearer_token: "{{AEMET_API_KEY}}"
+sink:
+  type: datahub-rest
+  config:
+    server: "http://localhost:8080" # port de Localhost a GMS /DataHub1

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iceberg-recipe
+  namespace: datahub1
+data:
+  iceberg.yml: |
+    source:
+      type: "iceberg"
+      config:
+        catalog:
+          default:
+            catalog_type: rest
+            uri: "http://nessie-service:19120/iceberg"
+            warehouse: "file:///home/ibdn/TFM/iceberg_warehouse"
+            properties:
+              py-io-impl: "pyiceberg.io.pyarrow.PyArrowFileIO"
+            ref: "main"
+            authentication_type: "NONE"
+        platform_instance: "default"
+        table_pattern:
+          allow:
+            - ".*"
+        profiling:
+          enabled: false
+
+    sink:
+      type: "datahub-rest"
+      config:
+        server: "http://datahub-datahub-gms.datahub1.svc.cluster.local:8080"
+        token: "${DATAHUB_TOKEN}"

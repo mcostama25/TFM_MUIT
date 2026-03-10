@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iceberg-ingestion-job
+  namespace: datahub1
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-nessie
+          image: busybox:latest
+          command: ['sh', '-c', 'until wget -q -O- http://nessie-service:19120/api/v2/config; do echo waiting for nessie; sleep 3; done']
+      containers:
+        - name: ingestion
+          image: datahub-ingestion-iceberg:latest
+          imagePullPolicy: IfNotPresent
+          command: ["datahub", "ingest", "-c", "/etc/recipes/iceberg.yml"]
+          env:
+            - name: DATAHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: datahub-token
+                  key: token
+          volumeMounts:
+            - name: recipe-volume
+              mountPath: /etc/recipes
+            - name: warehouse-volume
+              mountPath: /home/ibdn/TFM/iceberg_warehouse
+      volumes:
+        - name: recipe-volume
+          configMap:
+            name: iceberg-recipe
+        - name: warehouse-volume
+          hostPath:
+            path: /mnt/tfm
+            type: DirectoryOrCreate

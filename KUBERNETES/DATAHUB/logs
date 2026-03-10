@@ -1,0 +1,143 @@
+Name:             prerequisites-kafka-broker-0
+Namespace:        datahub1
+Priority:         0
+Service Account:  prerequisites-kafka
+Node:             datahub/192.168.49.2
+Start Time:       Tue, 10 Mar 2026 13:17:17 +0100
+Labels:           app.kubernetes.io/component=broker
+                  app.kubernetes.io/instance=prerequisites
+                  app.kubernetes.io/managed-by=Helm
+                  app.kubernetes.io/name=kafka
+                  app.kubernetes.io/part-of=kafka
+                  app.kubernetes.io/version=3.6.1
+                  apps.kubernetes.io/pod-index=0
+                  controller-revision-hash=prerequisites-kafka-broker-69d5d5866
+                  helm.sh/chart=kafka-26.11.2
+                  statefulset.kubernetes.io/pod-name=prerequisites-kafka-broker-0
+Annotations:      checksum/configuration: ecfe427ae8bef6bee33a7707b5178b455bf05e64ea5fc54bfa97823301d228cc
+Status:           Running
+SeccompProfile:   RuntimeDefault
+IP:               10.244.0.3
+IPs:
+  IP:           10.244.0.3
+Controlled By:  StatefulSet/prerequisites-kafka-broker
+Init Containers:
+  kafka-init:
+    Container ID:  docker://654b358111bce202d7f4ed71536296096823ea405c3909cf100d494e79c044a5
+    Image:         docker.io/bitnamilegacy/kafka:3.6.1-debian-12-r12
+    Image ID:      docker-pullable://bitnamilegacy/kafka@sha256:5f0ed16902daa9797f5cc22d872e6e40aac729df031ee1db32ddbb74133faa4c
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/bash
+    Args:
+      -ec
+      /scripts/kafka-init.sh
+      
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Mar 2026 13:18:15 +0100
+      Finished:     Tue, 10 Mar 2026 13:18:15 +0100
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      BITNAMI_DEBUG:     false
+      MY_POD_NAME:       prerequisites-kafka-broker-0 (v1:metadata.name)
+      KAFKA_VOLUME_DIR:  /bitnami/kafka
+      KAFKA_MIN_ID:      0
+    Mounts:
+      /bitnami/kafka from data (rw)
+      /config from kafka-config (rw)
+      /configmaps from kafka-configmaps (rw)
+      /scripts from scripts (rw)
+      /secret-config from kafka-secret-config (rw)
+      /tmp from tmp (rw)
+Containers:
+  kafka:
+    Container ID:   docker://78b329c536fd0b0387fc08dc3b3ea8337f478253b409f0c37e685c2ad5e6d344
+    Image:          docker.io/bitnamilegacy/kafka:3.6.1-debian-12-r12
+    Image ID:       docker-pullable://bitnamilegacy/kafka@sha256:5f0ed16902daa9797f5cc22d872e6e40aac729df031ee1db32ddbb74133faa4c
+    Ports:          9092/TCP (client), 9094/TCP (interbroker)
+    Host Ports:     0/TCP (client), 0/TCP (interbroker)
+    State:          Running
+      Started:      Tue, 10 Mar 2026 13:22:27 +0100
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Tue, 10 Mar 2026 13:20:30 +0100
+      Finished:     Tue, 10 Mar 2026 13:20:56 +0100
+    Ready:          True
+    Restart Count:  5
+    Limits:
+      cpu:     1
+      memory:  2Gi
+    Requests:
+      cpu:      250m
+      memory:   1Gi
+    Liveness:   tcp-socket :client delay=10s timeout=5s period=10s #success=1 #failure=3
+    Readiness:  tcp-socket :client delay=5s timeout=5s period=10s #success=1 #failure=6
+    Environment:
+      BITNAMI_DEBUG:    false
+      KAFKA_HEAP_OPTS:  -Xmx1024m -Xms1024m
+    Mounts:
+      /bitnami/kafka from data (rw)
+      /opt/bitnami/kafka/config/server.properties from kafka-config (rw,path="server.properties")
+      /opt/bitnami/kafka/logs from logs (rw)
+      /tmp from tmp (rw)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  data:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  data-prerequisites-kafka-broker-0
+    ReadOnly:   false
+  kafka-configmaps:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      prerequisites-kafka-broker-configuration
+    Optional:  false
+  kafka-secret-config:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kafka-config:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  tmp:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  scripts:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      prerequisites-kafka-scripts
+    Optional:  false
+  logs:
+    Type:        EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:      
+    SizeLimit:   <unset>
+QoS Class:       Burstable
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason            Age                 From               Message
+  ----     ------            ----                ----               -------
+  Warning  FailedScheduling  56m (x8 over 56m)   default-scheduler  0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. not found
+  Normal   Scheduled         56m                 default-scheduler  Successfully assigned datahub1/prerequisites-kafka-broker-0 to datahub
+  Normal   Pulling           56m                 kubelet            Pulling image "docker.io/bitnamilegacy/kafka:3.6.1-debian-12-r12"
+  Normal   Pulled            55m                 kubelet            Successfully pulled image "docker.io/bitnamilegacy/kafka:3.6.1-debian-12-r12" in 54.269s (54.269s including waiting). Image size: 616504661 bytes.
+  Normal   Created           55m                 kubelet            Created container: kafka-init
+  Normal   Started           55m                 kubelet            Started container kafka-init
+  Normal   Killing           52m (x2 over 54m)   kubelet            Container kafka failed liveness probe, will be restarted
+  Warning  Unhealthy         52m (x10 over 54m)  kubelet            Readiness probe failed: dial tcp 10.244.0.3:9092: connect: connection refused
+  Warning  Unhealthy         52m (x8 over 54m)   kubelet            Liveness probe failed: dial tcp 10.244.0.3:9092: connect: connection refused
+  Warning  BackOff           51m (x7 over 53m)   kubelet            Back-off restarting failed container kafka in pod prerequisites-kafka-broker-0_datahub1(b889f953-892a-40bf-9c42-e99f28e3f123)
+  Normal   Started           50m (x6 over 55m)   kubelet            Started container kafka
+  Normal   Created           50m (x6 over 55m)   kubelet            Created container: kafka
+  Normal   Pulled            50m (x6 over 55m)   kubelet            Container image "docker.io/bitnamilegacy/kafka:3.6.1-debian-12-r12" already present on machine

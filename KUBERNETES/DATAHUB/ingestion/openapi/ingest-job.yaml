@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: datahub-ingest-job
+  namespace: datahub1
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: ingest
+        image: datahub-ingestion-openapi:latest
+        imagePullPolicy: Never
+        command:
+          - datahub
+          - ingest
+          - "-c"
+          - "/recipes/DataEU.yaml"
+        volumeMounts:
+        - name: recipe
+          mountPath: /recipes
+        - name: openapi
+          mountPath: /openapi.yaml
+          subPath: openapi.yaml
+      volumes:
+      - name: recipe
+        configMap:
+          name: datahub-eu-recipe
+      - name: openapi
+        configMap:
+          name: openapi-spec

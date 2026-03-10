@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openapi-spec
+  namespace: datahub1
+data:
+  openapi.yaml: |
+    # AQUÍ HI VA EL CONTINGUT COMPLET DEL TEU FITXER openapi.yaml
+    openapi: 3.0.0
+    info:
+      title: Data Europa API
+      version: 1.0.0
+    paths:
+      /search:
+        get:
+          summary: Search endpoint
+          responses:
+            "200":
+              description: OK

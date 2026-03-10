@@ -1,0 +1,40 @@
+pipeline_name: EU_FEDE_Pipeline
+datahub_api:
+  server: "http://localhost:8082" # port de Localhost a GMS /Datahub1
+  token: "datahub"
+source:
+  type: datahub
+  config:
+    include_all_versions: false
+    database_connection:
+      scheme: "mysql+pymysql"
+      host_port: "localhost:3307" # port del mysql a localhost
+      username: datahub
+      password: datahub
+      database: datahub
+    kafka_connection:
+      bootstrap: broker-2:9093 # url del broker 
+      schema_registry_url: "http://schema-registry-2:8083" # url del schema registry de datahub 1 
+    stateful_ingestion:
+      enabled: true
+      ignore_old_state: false
+    urn_pattern:
+      deny:
+        - "^urn:li:dataHubPageModule.*"
+        - "^urn:li:dataHubPageModule.*"
+        - "^urn:li:dataHubIngestionSource.*"
+        - "^urn:li:dataHubExecutionRequest.*"
+        - "^urn:li:dataHubSecret.*"
+        - "^urn:li:dataHubAccessToken.*"
+        - "^urn:li:inviteToken.*"
+        - "^urn:li:globalSettings.*"
+        - "^urn:li:dataHubStepState.*"
+
+flags:
+  set_system_metadata: false
+      
+sink:
+  type: datahub-rest
+  config:
+    server: "http://localhost:8084" # port de Localhost a GMS /DdatahubFede
+    token: "datahub"
