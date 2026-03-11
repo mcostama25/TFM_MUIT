@@ -3,13 +3,17 @@ source:
   config:
     catalog:
       default:
-        catalog_type: rest
-        uri: "http://localhost:19120/api/v2"
-        warehouse_path: "file:///home/ibdn/TFM/iceberg_warehouse/default"
+        catalog_type: nessie
+        uri: "http://localhost:19120/iceberg"
+        warehouse_path: "file:///home/ibdn/TFM/iceberg_warehouse"
         ref: "main"
         authentication_type: "NONE"
         properties:
           py-io-impl: "pyiceberg.io.pyarrow.PyArrowFileIO"
+          s3.endpoint: "http://minio-service:9000"
+          s3.access-key-id: "zrhr0F4UXzLAe4R7Ee1L"
+          s3.secret-access-key: "JuPzdFbLEBimbHnjFcCMwEfZwvXDXa6mYZS6PsYZ"
+          s3.path-style-access: "true"
     platform_instance: "default"
     table_pattern:
       allow:
@@ -20,4 +24,4 @@ sink:
   type: "datahub-rest"
   config:
     server: "http://localhost:8080"
-    token: "${DATAHUB_TOKEN}"
+    token: "eyJhbGciOiJIUzI1NiJ9.eyJhY3RvclR5cGUiOiJVU0VSIiwiYWN0b3JJZCI6ImRhdGFodWIiLCJ0eXBlIjoiUEVSU09OQUwiLCJ2ZXJzaW9uIjoiMiIsImp0aSI6IjhkODJhODIyLWM5YmEtNDAxYy04YmZjLTMzOTk5ZTE1N2EwYiIsInN1YiI6ImRhdGFodWIiLCJleHAiOjE3NzU4NDMyNzUsImlzcyI6ImRhdGFodWItbWV0YWRhdGEtc2VydmljZSJ9.vz3SwjNpekfOXw3uHTM3GU7JbD0KkQvJGKd-TarqVC8"

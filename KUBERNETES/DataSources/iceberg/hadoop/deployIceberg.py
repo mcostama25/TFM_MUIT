@@ -21,67 +21,52 @@ class IcebergETLDataPipeline:
         self.spark = self._init_spark_session()
 
     def _init_spark_session(self) -> SparkSession:
-        # El paquet que ja sabem que Spark troba i descarrega bé
+        # Paquets necessaris:
+        # 1. iceberg-spark-runtime: El motor d'Iceberg
+        # 2. hadoop-aws: Perquè Spark pugui parlar amb S3 (MinIO)
+        # 3. bundle: Implementació específica de AWS/S3 per a Iceberg
         iceberg_pkg = (
-            "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2,"
-            "org.projectnessie.nessie-integration:nessie-spark-extensions-3.5_2.12:0.79.0"
+            "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.1,"
+            "org.apache.iceberg:iceberg-aws-bundle:1.6.1"
         )
 
         conf = SparkConf()
         conf.set("spark.jars.packages", iceberg_pkg)
-        
-        # 1. Extensions obligatòries d'Iceberg
-        conf.set("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
-        
-        # 2. Configuració del Catàleg (Segons documentació oficial de Nessie)
+        conf.set(
+            "spark.sql.extensions",
+            "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+        )
+
+        # --- CONFIGURACIÓ DEL CATÀLEG (NESSIE REST) ---
         conf.set(f"spark.sql.catalog.{self.catalog_name}", "org.apache.iceberg.spark.SparkCatalog")
-        
-        # IMPORTANT: Useu NessieCatalog en lloc de RESTCatalog
-        conf.set(f"spark.sql.catalog.{self.catalog_name}.catalog-impl", 
-                "org.apache.iceberg.rest.RESTCatalog")
-        
-        # La URI apunta a l'API base de Nessie, NO a la d'Iceberg
-        conf.set(f"spark.sql.catalog.{self.catalog_name}.uri", 
-                "http://localhost:19120/iceberg/v1")
-        
-        # Referència a la branca (main per defecte)
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.catalog-impl", "org.apache.iceberg.rest.RESTCatalog")
+        # Recorda fer port-forward de nessie-service 19120:19120
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.uri", "http://localhost:19120/iceberg")
         conf.set(f"spark.sql.catalog.{self.catalog_name}.ref", "main")
         
-        # Ubicació física de les dades (com que Spark corre fora de K8s, usem la ruta d'Ubuntu)
-        conf.set(f"spark.sql.catalog.{self.catalog_name}.warehouse", f"file://{self.warehouse_dir}")
+        # --- CONFIGURACIÓ DE L'STORAGE (S3 / MINIO) ---
+        # Diem a Iceberg que utilitzi S3FileIO per escriure les dades
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.warehouse", "s3://warehouse/")
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.s3.endpoint", "http://localhost:9000")
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.s3.path-style-access", "true")
         
+        # Credencials (les que hem posat al YAML de MinIO)
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.s3.access-key-id", "admin")
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.s3.secret-access-key", "password")
+        conf.set(f"spark.sql.catalog.{self.catalog_name}.client.region", "us-east-1")
+
+        # Configuració Hadoop (necessària per a algunes operacions internes de Spark amb S3A)
+        # conf.set("spark.hadoop.fs.s3a.endpoint", "http://localhost:9007")
+        # conf.set("spark.hadoop.fs.s3a.access.key", "admin")
+        # conf.set("spark.hadoop.fs.s3a.secret.key", "password")
+        # conf.set("spark.hadoop.fs.s3a.path.style.access", "true")
+        # conf.set("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+
         return SparkSession.builder \
             .config(conf=conf) \
-            .appName("Nessie_Iceberg_Pipeline") \
+            .appName("Nessie_Iceberg_S3_Pipeline") \
             .getOrCreate()
-    # def _init_spark_session(self) -> SparkSession:
-    #     """
-    #     Inicializa SparkSession con el Runtime de Iceberg y el Catálogo Hadoop.
-    #     """
-    #     print(f"[{datetime.now()}] Inicializando Spark Session con soporte Iceberg...")
-        
-    #     # Coordenadas Maven (Spark 3.5 / Scala 2.12 / Iceberg 1.5.2)
-    #     iceberg_pkg = "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2"
-
-    #     conf = SparkConf()
-    #     conf.set("spark.jars.packages", iceberg_pkg)
-        
-    #     # Extensiones SQL para soportar comandos DDL/DML de Iceberg (MERGE, CALL, etc.)
-    #     conf.set("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
-        
-    #     # Configuración del Catálogo (Backend: Hadoop/FileSystem)
-    #     conf.set(f"spark.sql.catalog.{self.catalog_name}", "org.apache.iceberg.spark.SparkCatalog")
-    #     conf.set(f"spark.sql.catalog.{self.catalog_name}.type", "hadoop")
-    #     conf.set(f"spark.sql.catalog.{self.catalog_name}.warehouse", self.warehouse_dir)
-        
-    #     # Optimizaciones de Escritura
-    #     # check-nullability=false permite mejor rendimiento si garantizamos datos limpios antes
-    #     conf.set("spark.sql.iceberg.check-nullability", "false") 
-        
-    #     return SparkSession.builder \
-    #         .config(conf=conf) \
-    #         .appName("Production_CSV_to_Iceberg") \
-    #         .getOrCreate()
 
     def define_schema(self) -> StructType:
         """

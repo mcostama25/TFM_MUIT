@@ -190,6 +190,19 @@ kafka:
       protocol: PLAINTEXT
   controller:
     replicaCount: 0
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6    # 6 fallades × 10s = 60s de marge
+    successThreshold: 1
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  heapOpts: "-Xmx1g -Xms1g"
   broker:
     replicaCount: 1
     # The new minId for broker is 100. If we don't override this, the broker will have id 100

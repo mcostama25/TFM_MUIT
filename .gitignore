@@ -1,0 +1,5 @@
+# Ignore the secret file containing the DataHub token, which may contain sensitive information
+KUBERNETES/DATAHUB/ingestion/iceberg/k8sJobs/secret-datahub-token.yaml
+
+# Ignore the data input directory for iceberg, which may contain sensitive information
+KUBERNETES/DataSources/iceberg/hadoop/data_input
