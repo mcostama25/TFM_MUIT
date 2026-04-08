@@ -4,7 +4,7 @@ source:
     name: "AEMET_OpenAPI"
     swagger_file: "/AEMET_OpenData_specification.json"
     url: "https://opendata.aemet.es"
-    bearer_token: "{{AEMET_API_KEY}}"
+    bearer_token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJ0aS5jb3N0YS5tYXJ0QGdtYWlsLmNvbSIsImp0aSI6IjM3NWI2YmJhLWQxN2EtNGZjNC05ZGEwLTc2ZjUxYTcxZDhhZCIsImlzcyI6IkFFTUVUIiwiaWF0IjoxNzc0MDMxMTM4LCJ1c2VySWQiOiIzNzViNmJiYS1kMTdhLTRmYzQtOWRhMC03NmY1MWE3MWQ4YWQiLCJyb2xlIjoiIn0.JOpEcBL05sgiIdsz0PbeDGFVh3UitKZ1AJzw_wHbHng"
 sink:
   type: datahub-rest
   config:

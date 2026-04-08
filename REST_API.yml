@@ -1,0 +1,2616 @@
+openapi: 3.0.3
+info:
+  title: DCAT3 Data Space API
+  description: REST API para gestionar espacios de datos segun el modelo DCAT3
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.org
+
+
+#__PATHS__
+paths:
+  # ____Catalogs____
+  /catalogs:
+    get:
+      summary: Lista de catalogos
+      parameters: # Filtros de busqueda:
+        - in: query  # Por tema
+          name: theme
+          required: false
+          schema:
+            type: string
+        - in: query  # Por palabra clave
+          name: keyword
+          required: false
+          schema:
+            type: string
+        - in: query  # Por publicador
+          name: publisher
+          required: false
+          schema:
+            type: string
+        - in: query  # Por derechos de acceso
+          name: access_rights
+          required: false
+          schema:
+            type: string
+        - in: query  # Por licencia
+          name: license
+          required: false
+          schema:
+            type: string
+        - in: query  # Por estandar
+          name: conforms_to
+          required: false
+          schema:
+            type: string
+        - in: query  # Por estado
+          name: status
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de catalogos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Catalog'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nuevo catalogo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog'
+      responses:
+        '201':
+          description: Catalogo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+
+  /catalogs/{catalog_id}:
+    get:
+      summary: Obtener un catalogo concreto
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Catalogo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar catalogo
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog'
+      responses:
+        '200':
+          description: Catalogo actualizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar catalogo
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Catalogo eliminado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /catalogs/{catalog_id}/catalog_records:
+    get:
+      summary: Listar catalog_records de un catálogo concreto
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: Llista de datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dataset'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /catalog_records:
+    get:
+      summary: Listar todos los catalog_records
+      parameters:
+        - in: query
+          name: catalog_id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Llista de datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dataset'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nuevo catalog_record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog_record'
+      responses:
+        '201':
+          description: Catalogo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /catalog_record/{catalog_record_id}:
+    get:
+      summary: Listar un catalog_record concreto
+      parameters:
+        - in: path
+          name: catalog_record_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Catalogo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Editar un catalog_record concreto
+      parameters:
+        - in: path
+          name: catalog_record_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog_record'
+      responses:
+        '200':
+          description: Catalogo actualizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar catalog_record
+      parameters:
+        - in: path
+          name: catalog_record_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Catalog_record eliminado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /catalogs/{catalog_id}/datasets:
+    get:
+      summary: Listar datasets de catálogo con filtros
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: query     # Filtros de busqueda:
+          name: theme   # Por tema
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword # Por palabra clave
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: spatial_coverage # Por cobertura espacial
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: temporal_start # Por inicio temporal
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: temporal_end  # Por fin temporal
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: language  # Por idioma
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: access_rights  # Por derechos de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: license  # Por licencia
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: publisher  # Por publicador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: status  # Por estado
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: replaces  # Por reemplazamiento
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Llista de datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dataset'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear dataset en un catalogo
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: Dataset creado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /catalogs/{catalog_id}/datasets/{dataset_id}:
+    get:
+      summary: Obtener un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '200':
+          description: Dataset actualizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset eliminado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /catalogs/{catalog_id}/datasets/{dataset_id}/distributions:
+    get:
+      summary: Listar distribucions de un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+        - in: query     # Filtros de busqueda:
+          name: access_service   # Por servicio de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: format # Por formato
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: packageFormat # Por formato de empaquetdo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: compressFormat # Por formato de compresión
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: mediaType  # Por tipo de medio
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de distribucions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Distributions'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear distribucion para un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Distributions'
+      responses:
+        '201':
+          description: Distribución creada
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        
+  /catalogs/{catalog_id}/datasets/{dataset_id}/dataservices:
+    get:
+      summary: Listar servicios de datos de un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+        - in: query     # Filtros de busqueda:
+          name: theme   # Por tema
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword # Por palabra clave
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: language  # Por idioma
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: access_rights  # Por derechos de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: license  # Por licencia
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: publisher  # Por publicador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: creator  # Por creador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: status  # Por estado
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de servicios de datos del dataset.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataService'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear servicio de datos para un dataset
+      parameters:
+        - in: path
+          name: catalog_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataService'
+      responses:
+        '201':
+          description: Servicio de datos creado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ____Datasets____
+  /datasets:
+    get:
+      summary: Filtrar datasets por tema y cobertura temporal
+      parameters:  # Filtros de busqueda:
+        - in: query  # Por tema
+          name: theme
+          required: false
+          schema:
+            type: string
+        - in: query # Por cobertura espacial
+          name: spatial_coverage
+          required: false
+          schema:
+            type: string
+        - in: query  # Por palabra clave
+          name: keyword
+          required: false
+          schema:
+            type: string
+        - in: query   # Por inicio temporal
+          name: temporal_start
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query   # Por fin temporal
+          name: temporal_end
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Lista filtrada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dataset'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear un dataset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: Dataset creado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    
+  /datasets/{dataset_id}:
+    get:
+      summary: Obtener un dataset concreto
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '200':
+          description: Dataset actualizado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset eliminado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        
+  /datasets/{dataset_id}/distributions:
+    get:
+      summary: Listar distribuciones de un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+        - in: query     # Filtros de busqueda:
+          name: access_service   # Por servicio de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: format # Por formato
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: packageFormat # Por formato de empaquetdo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: compressFormat # Por formato de compresión
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: mediaType  # Por tipo de medio
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de distribuciones del dataset.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Distributions'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear una distribución para un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Distribución creada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      
+
+  /datasets/{dataset_id}/distributions/{distribution_id}:
+    get:
+      summary: Obtener una distribución de un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: distribution_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Distribución del dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Distributions'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar una distribución de un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: distribution_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Distributions'
+      responses:
+        '200':
+          description: Distribución actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar una distribución de un dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: distribution_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ____Data Services____
+  /dataservices:
+    get:
+      summary: Filtrar servicios de datos por endpoint y más
+      parameters:
+        - in: query     # Filtros de busqueda:
+          name: theme   # Por tema
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword # Por palabra clave
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: dataset # Por conjunto de datos
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: language  # Por idioma
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: access_rights  # Por derechos de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: license  # Por licencia
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: publisher  # Por publicador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: creator  # Por creador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: status  # Por estado
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: replaces  # Por reemplazamiento
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Llista de serveis
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataService'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear servicio de datos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataService'
+      responses:
+        '201':
+          description: DataService creado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /dataservices/{service_id}:
+    get:
+      summary: Obtener un servicio de datos
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Servicio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataService'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar servicio
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataService'
+      responses:
+        '200':
+          description: DataService actualitzado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Esborrar servei
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Borrado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /dataservices/{service_id}/datasets:
+    get:
+      summary: Datasets servidos por un servicio concreto
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+        - in: query     # Filtros de busqueda:
+          name: theme   # Por tema
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword # Por palabra clave
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: spatial_coverage # Por cobertura espacial
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: temporal_start # Por inicio temporal
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: temporal_end  # Por fin temporal
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: language  # Por idioma
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: access_rights  # Por derechos de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: license  # Por licencia
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: publisher  # Por publicador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: status  # Por estado
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: replaces  # Por reemplazamiento
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Llista datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dataset'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Crear dataset servido por un servicio
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: Dataset creado y servido por el servicio de datos.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /dataservices/{service_id}/datasets/{dataset_id}:
+    get:
+      summary: Obtener un dataset servido por un servicio
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dataset servido por el servicio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar un dataset servido por un servicio
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '200':
+          description: Dataset actualizado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar un dataset servido por un servicio
+      parameters:
+        - in: path
+          name: service_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset eliminado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      
+   # ____Distributions____
+  /distributions:
+    get:
+      summary: Filtrar distribuciones por acceso, formato y más
+      parameters:  # Filtros de busqueda:
+        - in: query     # Filtros de busqueda:
+          name: access_service   # Por servicio de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: format # Por formato
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: packageFormat # Por formato de empaquetdo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: compressFormat # Por formato de compresión
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: mediaType  # Por tipo de medio
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de distribuciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Distributions'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear una distribución
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Distributions'
+      responses:
+        '201':
+          description: Distribución creada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /distributions/{distribution_id}:
+    get:
+      summary: Obtener una distribución concreta
+      parameters:
+        - in: path
+          name: distribution_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Distribución
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Distributions'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar una distribución
+      parameters:
+        - in: path
+          name: distribution_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Distributions'
+      responses:
+        '200':
+          description: Distribución actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar una distribución
+      parameters:
+        - in: path
+          name: distribution_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        
+  /keywords:
+    get:
+      summary: Obtener la lista de todas las keywords
+      responses:
+        '200':
+          description: Lista de keywords
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Keywords'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nueva keyword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Keywords'
+      responses:
+        '201':
+          description: Keyword creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /keywords/{keyword_id}:
+    delete:
+      summary: Borrar una keyword
+      parameters:
+        - in: path
+          name: keyword_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /themes:
+    get:
+      summary: Obtener la lista de todas los temas
+      responses:
+        '200':
+          description: Lista de themes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Themes'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nuevo tema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Themes'
+      responses:
+        '201':
+          description: Tema creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Themes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /themes/{theme_id}:
+    delete:
+      summary: Borrar un tema
+      parameters:
+        - in: path
+          name: theme_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /references:
+    get:
+      summary: Obtener la lista de todas las referencias
+      responses:
+        '200':
+          description: Lista de referencias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/References'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nueva referencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/References'
+      responses:
+        '201':
+          description: Referencia creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/References'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /references/{reference_id}:
+    get:
+      summary: Listar referencia por id
+      parameters:
+        - in: path
+          name: reference_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Referencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/References'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Editar una referencia
+      parameters:
+        - in: path
+          name: reference_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/References'
+      responses:
+        '200':
+          description: Referencia actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        
+    delete:
+      summary: Borrar una referencia
+      parameters:
+        - in: path
+          name: reference_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /relations:
+    get:
+      summary: Listar todas las relaciones
+      responses:
+        '200':
+          description: Lista de relaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Relations'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nueva relacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relations'
+      responses:
+        '201':
+          description: Relacion creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relations'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /relations/{relation_id}:
+    get:
+      summary: Listar relacion por id
+      parameters:
+        - in: path
+          name: relation_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Relacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relations'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Editar una relacion
+      parameters:
+        - in: path
+          name: relation_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relations'
+      responses:
+        '200':
+          description: Relacion actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        
+    delete:
+      summary: Borrar una relacion
+      parameters:
+        - in: path
+          name: relation_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /resources/{resource_id}/relations:
+    get:
+      summary: Listar relaciones de una entidad concreta
+      parameters:
+        - in: path
+          name: resource_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de relaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Relations'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  # /resources/{resource_id}/relations/{relation_type}/resources:
+  #   get:
+  #     summary: listar resources relacionadas con una resource de deteminada forma
+  #     parameters:
+  #       - in: path
+  #         name: resource_id
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: relation_type
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: Lista de resources relacionadas
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Resources'
+  #       '500':
+  #         $ref: '#/components/responses/InternalError'
+          
+  # Qualified Relaations
+  /qualified_relations:
+    get:
+      summary: Listar todas las relaciones
+      responses:
+        '200':
+          description: Lista de relaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QualifiedRelations'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nueva relacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QualifiedRelations'
+      responses:
+        '201':
+          description: Relacion creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifiedRelations'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /qualified_relations/{relation_id}:
+    get:
+      summary: Listar relacion por id
+      parameters:
+        - in: path
+          name: relation_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Relacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifiedRelations'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Editar una relacion
+      parameters:
+        - in: path
+          name: relation_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QualifiedRelations'
+      responses:
+        '200':
+          description: Relacion actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        
+    delete:
+      summary: Borrar una relacion
+      parameters:
+        - in: path
+          name: relation_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribución eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /resources/{resource_id}/qualified_relations:
+    get:
+      summary: Listar relaciones de una entidad concreta
+      parameters:
+        - in: path
+          name: resource_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de relaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QualifiedRelations'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  # /resources/{resource_id}/qualified_relations/{relation_type}/resources:
+  #   get:
+  #     summary: listar resources relacionadas con una resource de deteminada forma
+  #     parameters:
+  #       - in: path
+  #         name: resource_id
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: relation_type
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: Lista de resources relacionadas
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Resources'
+  #       '500':
+  #         $ref: '#/components/responses/InternalError'
+          
+  /resources:
+    get:
+      summary: Listar todas als intancias de Resource
+      responses:
+        '200':
+          description: Lista de resources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resources'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nueva resource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resources'
+      responses:
+        '201':
+          description: Resource creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resources'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /resources/{resource_id}:
+    get:
+      summary: Listar resource por Id
+      parameters:
+        - in: path
+          name: resource_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Distribución
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resources'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar una resource
+      parameters:
+        - in: path
+          name: resource_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resources'
+      responses:
+        '200':
+          description: Resource actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar una Resource
+      parameters:
+        - in: path
+          name: resource_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Resource eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+            
+  /datasetseries:
+    get:
+      summary: Listar todos los dataset series
+      responses:
+        '200':
+          description: Lista de dataset series
+          content:
+            application/json:
+              schema:
+
+                type: array
+                items:
+                  $ref: '#/components/schemas/DatasetSeries'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Crear nueva DatasetSeries
+      requestBody:
+        required: true
+        content:
+          application/json:
+
+            schema:
+              $ref: '#/components/schemas/DatasetSeries'
+      responses:
+        '201':
+          description: DatasetSeries creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetSeries'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /datasetseries/{dataset_series_id}:
+    get:
+      summary: Devolver datasetSeries por Id
+      parameters:
+        - in: path
+          name: dataset_series_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Distribución
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetSeries'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Actualizar un datasetSeries
+      parameters:
+        - in: path
+          name: dataset_series_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasetSeries'
+      responses:
+        '200':
+          description: datasetSeries actualizada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Borrar una datasetSeries
+      parameters:
+        - in: path
+          name: dataset_series_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: datasetSeries eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+  /datasetseries/{dataset_series_id}/datasets:
+    get:
+      summary: Datasets dentro de un datasetseries
+      parameters:
+        - in: path
+          name: dataset_series_id
+          required: true
+          schema:
+            type: string
+        - in: query     # Filtros de busqueda:
+          name: theme   # Por tema
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword # Por palabra clave
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: spatial_coverage # Por cobertura espacial
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: temporal_start # Por inicio temporal
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: temporal_end  # Por fin temporal
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: language  # Por idioma
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: access_rights  # Por derechos de acceso
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: license  # Por licencia
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: publisher  # Por publicador
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: conforms_to  # Por estandar
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: status  # Por estado
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title  # Por titulo
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: replaces  # Por reemplazamiento
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Llista datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dataset'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+#__ COMPONENTS__
+components:
+  schemas:
+    Catalog:
+      type: object
+      properties:
+        dcterms_identifier:
+          type: string
+        foaf_homepage:
+          type: string
+          format: uri
+        dcat_resource:
+          type: string
+        dcterms_creator:
+          type: string
+        dcterms_description:
+          type: string
+        dcterms_title:
+          type: string
+        dcterms_modified:
+          type: string
+          format: date
+        dcterms_issued:
+          type: string
+          format: date
+        dcat_servesDataset:
+          type: string
+        dcat_hasDataService:
+          type: string
+        dcat_version:
+          type: string
+        dcat_prev:
+          type: string
+        dcat_next:
+          type: string
+        adms_status:
+          type: string
+          
+    Catalog_record:
+      type: object
+      properties:
+        id:
+          type: string
+        dcat_catalog:
+          type: string
+        dct_title:
+          type: string
+        dct_description:
+          type: string
+        dct_issued:
+          type: string
+          format: date
+        foaf_primary_topic:
+          type: string
+
+    Dataset:
+      type: object
+      properties:
+        dcterms_identifier:
+          type: string
+        dcterms_title:
+          type: string
+        dcterms_description:
+          type: string
+        dcat_catalog:
+          type: string
+        dcat_datasetSeries:
+          type: string
+        dcat_spatialResolutionInMeters:
+          type: string
+        dcterms_spatial:
+          type: string
+        dcterms_temporal:
+          type: string
+        dcterms_temporalResolution:
+          type: string
+        prov_wasGeneratedBy:
+          type: string
+        dcat_theme:
+          type: string
+        dcterms_accessRights:
+          type: string
+        dcterms_conformsTo:
+          type: string
+        dcterms_contactPoint:
+          type: string
+        dcterms_publisher:
+          type: string
+        dcat_landingPage:
+          type: string
+          format: uri
+        dcterms_license:
+          type: string
+        dcterms_language:
+          type: string
+        dcterms_rights:
+          type: string
+        dcterms_issued:
+          type: string
+          format: date
+        dcterms_modified:
+          type: string
+          format: date
+        dcat_hasVersion:
+          type: string
+        dcat_prevVersion:
+          type: string
+        dcat_nextVersion:
+          type: string
+        dcat_first:
+          type: string
+        dcat_last:
+          type: string
+        adms_status:
+          type: string
+        adms_versionNotes:
+          type: string
+
+    Distributions:
+      type: object
+      properties:
+        dcterms_identifier:
+          type: string
+        dcat_dataset:
+          type: string
+        dcat_accessURL:
+          type: string
+          format: uri
+        dcat_downloadURL:
+          type: string
+          format: uri
+        dcterms_accessRights:
+          type: string
+        dcterms_conformsTo:
+          type: string
+        dcterms_description:
+          type: string
+        dcterms_format:
+          type: string
+        dcterms_license:
+          type: string
+        dcterms_issued:
+          type: string
+          format: date
+        dcterms_modified:
+          type: string
+          format: date
+        dcterms_rights:
+          type: string
+        dcterms_language:
+          type: string
+        dcterms_temporal:
+          type: string
+        dcat_mediaType:
+          type: string
+        dcat_packageFormat:
+          type: string
+        dcat_compressFormat:
+          type: string
+        spdx_checksum:
+          type: string
+
+    DataService:
+      type: object
+      properties:
+        dcterms_identifier:
+          type: string
+        dcat_catalog:
+          type: string
+        dcat_servesDataset:
+          type: string
+        dcterms_accessRights:
+          type: string
+        dcterms_conformsTo:
+          type: string
+        dcterms_description:
+          type: string
+        dcterms_creator:
+          type: string
+        dcat_contactPoint:
+          type: string
+        dcterms_title:
+          type: string
+        dcterms_license:
+          type: string
+        dcterms_language:
+          type: string
+        dcterms_issued:
+          type: string
+          format: date
+        dcterms_modified:
+          type: string
+          format: date
+        dcat_endpointURL:
+          type: string
+          format: uri
+        dcat_endpointDescription:
+          type: string
+          format: uri
+        dcat_hasVersion:
+          type: string
+        dcat_prevVersion:
+          type: string
+        dcat_nextVersion:
+          type: string
+        dcat_first:
+          type: string
+        dcat_last:
+          type: string
+        adms_status:
+          type: string
+          
+    Relations:
+      type: object
+      properties:
+        dcterms_identifier1:
+          type: string
+        dcterms_identifier2:
+          type: string
+        dcat:relation:
+          type: string
+          
+    QualifiedRelations:
+      type: object
+      properties:
+        dcterms_identifier1:
+          type: string
+        dcterms_identifier2:
+          type: string
+        dcat_qualified-relation:
+          type: string
+          
+    DatasetSeries:
+      type: object
+      properties:
+        id:
+          type: string
+        dct_onforms_to:
+          type: string
+        dct_creator_:
+          type: string
+        dct_identifier:
+          type: string
+        dct_issued:
+          type: string
+          format: date
+        dct_modified:
+          type: string
+          format: date
+        dct_title:
+          type: string
+        dct_description:
+          type: string
+        dct_spatial:
+          type: string
+        dct_spatial_resolution_in_meters:
+          type: number
+        dct_temporal:
+          type: string
+        dct_temporal_resolution:
+          type: string
+        prov_generated_by:
+          type: string
+        dct_access_rights:
+          type: string
+        ordl_has_policy:
+          type: string
+        dct_licence:
+          type: string
+        dcat_inseries:
+          type: string
+        dcat_landing_page:
+          type: string
+          format: uri
+        dcat_contact_point:
+          type: string
+        dct_language:
+          type: string
+        dct_rights:
+          type: string
+        dct_publisher:
+          type: string
+        dct_type:
+          type: string
+        pro_qualified_attribution:
+          type: string
+        dct_accrual_periodicity:
+          type: string
+        dcat_has_current_version:
+          type: string
+        dcat_version:
+          type: string
+        dcat_previous_version:
+          type: string
+        adms_version_notes:
+          type: string
+        dcat_first:
+          type: string
+        dcat_last:
+          type: string
+        dcat_prev:
+          type: string
+        dct_replaces:
+          type: string
+        adms_status:
+          type: string
+          
+    Resources:
+      type: object
+      properties:
+        id:
+          type: string
+        resource_id:
+          type: string
+        resoruce_type:
+          type: string
+          
+    References:
+      type: object
+      properties:
+        referenced_resource:
+          type: string
+        reference:
+          type: string
+      
+    Keywords:
+      type: object
+      properties:
+        id: 
+          type: string
+        keyword: 
+          type: string
+        resource:
+          type: string
+          
+    Themes:
+      type: object
+      properties:
+        id: 
+          type: string
+        theme: 
+          type: string
+        resource:
+          type: string
+          
+    ErrorResponse:
+        type: object
+        properties:
+          error:
+            type: string
+          details:
+            type: string
+            nullable: true
+
+  responses:
+    BadRequest:
+      description: Petición mal formulada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicte, recurs ja existent
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: No autoritzadp
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Acceso prohibido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

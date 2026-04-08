@@ -1,0 +1,10 @@
+mutation addOwners {
+    addOwner(
+      input: {
+        ownerUrn: "urn:li:corpGroup:bfoo",
+        resourceUrn: "urn:li:dataset:(urn:li:dataPlatform:hive,fct_users_created,PROD)",
+        ownerEntityType: CORP_GROUP,
+        type: TECHNICAL_OWNER
+            }
+    )
+}

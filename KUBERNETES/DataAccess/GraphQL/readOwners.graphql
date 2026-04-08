@@ -1,0 +1,18 @@
+query {
+  dataset(urn: "urn:li:dataset:(urn:li:dataPlatform:hive,SampleHiveDataset,PROD)") {
+    ownership {
+      owners {
+        owner {
+          ... on CorpUser {
+            urn
+            type
+          }
+          ... on CorpGroup {
+            urn
+            type
+          }
+        }
+      }
+    }
+  }
+}

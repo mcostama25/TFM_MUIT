@@ -1,0 +1,27 @@
+query searchDatasets {
+  search(input: {
+    type: DATASET,
+    query: "*",
+    start: 0,
+    count: 10
+  }) {
+    start
+    count
+    total
+    searchResults {
+      entity {
+        urn
+        type
+        ... on Dataset {
+          name
+          platform {
+            name
+          }
+          properties {
+            description
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+query getDataset {
+  dataset(urn: "urn:li:dataset:(urn:li:dataPlatform:iceberg,default.my_table,PROD)") {
+    urn
+    name
+    platform {
+      name
+    }
+    properties {
+      description
+      customProperties {
+        key
+        value
+      }
+    }
+    schemaMetadata {
+      fields {
+        fieldPath
+        type
+        nativeDataType
+        description
+      }
+    }
+    tags {
+      tags {
+        tag {
+          urn
+          properties {
+            name
+          }
+        }
+      }
+    }
+  }
+}

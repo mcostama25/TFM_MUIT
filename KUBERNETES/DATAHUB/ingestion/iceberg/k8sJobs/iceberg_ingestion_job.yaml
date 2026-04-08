@@ -9,15 +9,11 @@ spec:
   template:
     spec:
       restartPolicy: Never
-      initContainers:
-        - name: wait-for-nessie
-          image: busybox:latest
-          command: ['sh', '-c', 'until wget -q -O- http://nessie-service:19120/api/v2/config; do echo waiting for nessie; sleep 3; done']
       containers:
         - name: ingestion
           image: datahub-ingestion-iceberg:latest
           imagePullPolicy: IfNotPresent
-          command: ["datahub", "ingest", "-c", "/etc/recipes/iceberg.yml"]
+          command: ["datahub", "ingest", "run", "-c", "/etc/recipes/iceberg.yml"]
           env:
             - name: DATAHUB_TOKEN
               valueFrom:

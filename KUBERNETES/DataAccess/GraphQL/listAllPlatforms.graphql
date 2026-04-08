@@ -1,0 +1,11 @@
+query listAllPlatforms {
+  listDataPlatforms {
+    urn
+    name
+    properties {
+      displayName
+      type
+      datasetNameDelimiter
+    }
+  }
+}

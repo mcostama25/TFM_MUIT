@@ -1,0 +1,8 @@
+mutation removeOwners {
+    removeOwner(
+      input: {
+        ownerUrn: "urn:li:corpuser:jdoe",
+        resourceUrn: "urn:li:dataset:(urn:li:dataPlatform:hdfs,SampleHdfsDataset,PROD)",
+            }
+    )
+}

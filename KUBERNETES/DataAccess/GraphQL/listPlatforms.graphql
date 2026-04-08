@@ -1,0 +1,21 @@
+query listPlatforms {
+  search(input: {
+    type: DATA_PLATFORM,
+    query: "*",
+    start: 0,
+    count: 20
+  }) {
+    searchResults {
+      entity {
+        urn
+        ... on DataPlatform {
+          name
+          properties {
+            displayName
+            type
+          }
+        }
+      }
+    }
+  }
+}
