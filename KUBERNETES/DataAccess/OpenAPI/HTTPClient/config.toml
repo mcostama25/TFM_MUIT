@@ -1,0 +1,6 @@
+[datahub]
+base_url = "http://localhost:8080"
+token = "YOUR_DATAHUB_PERSONAL_ACCESS_TOKEN"
+
+[server]
+port = 3000
