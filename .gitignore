@@ -1,5 +1,26 @@
-# Ignore the secret file containing the DataHub token, which may contain sensitive information
+# ── Secrets & credentials ────────────────────────────────────────────────────
+
+# DataHub token secrets (Kubernetes)
 KUBERNETES/DATAHUB/ingestion/iceberg/k8sJobs/secret-datahub-token.yaml
 
-# Ignore the data input directory for iceberg, which may contain sensitive information
+# Ingestion recipes that embed real API keys / tokens
+DOCKER/ingestion/AEMET.yaml
+KUBERNETES/DATAHUB/ingestion/iceberg/AEMET.yaml
+# Local runtime configs with embedded tokens
+KUBERNETES/DataAccess/GraphQL/HTTPClient/config.toml
+
+# ── Data files ────────────────────────────────────────────────────────────────
 KUBERNETES/DataSources/iceberg/hadoop/data_input
+
+# ── Build artifacts ───────────────────────────────────────────────────────────
+**/target/
+
+# ── Vendor / generated assets ─────────────────────────────────────────────────
+# Large minified Swagger UI files — serve from CDN instead
+KUBERNETES/DataAccess/OpenAPI/OpenAPI_files/swagger-ui-bundle.js
+KUBERNETES/DataAccess/OpenAPI/OpenAPI_files/swagger-ui-standalone-preset.js
+KUBERNETES/DataAccess/OpenAPI/OpenAPI_files/swagger-ui.css
+
+# ── Local tooling ─────────────────────────────────────────────────────────────
+.claude/
+CLAUDE.md

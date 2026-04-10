@@ -1,0 +1,51 @@
+[package]
+name = "datahub-kafka-consumer"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "datahub-kafka-consumer"
+path = "src/main.rs"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Kafka — dynamic-linking links against the system-installed librdkafka (no C compilation needed).
+# Requires: sudo apt-get install librdkafka-dev   (Ubuntu/Debian)
+#           brew install librdkafka               (macOS)
+rdkafka = { version = "0.36", features = ["dynamic-linking", "tokio"] }
+
+# Avro decoding
+apache-avro = { version = "0.16", features = ["snappy"] }
+
+# HTTP — for schema registry fetch and health probe
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# Web framework — health endpoint
+axum = "0.7"
+tower-http = { version = "0.5", features = ["trace"] }
+
+# Serialisation
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Config (mirrors HTTPClient pattern)
+config = "0.14"
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Async traits
+async-trait = "0.1"
+
+# Byte utilities (reading Confluent 5-byte wire-format header)
+bytes = "1"
+
+# futures for stream extension trait
+futures = "0.3"

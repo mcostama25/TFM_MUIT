@@ -1,0 +1,17 @@
+[kafka]
+bootstrap_servers = "localhost:9092"
+group_id = "datahub-dcat-consumer-dev"
+# topics is a TOML array — override scalars via env vars, leave topics here
+topics = [
+  "MetadataChangeProposal_v1",
+  "MetadataChangeLog_Versioned_v1",
+  "MetadataChangeLog_Timeseries_v1"
+]
+auto_offset_reset = "earliest"
+
+[schema_registry]
+# DataHub GMS exposes a Confluent SR-compatible API at /schema-registry/api/
+url = "http://localhost:8080"
+
+[server]
+port = 3001

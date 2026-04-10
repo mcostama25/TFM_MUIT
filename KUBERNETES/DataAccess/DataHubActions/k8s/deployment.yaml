@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datahub-kafka-consumer
+  namespace: datahub1
+  labels:
+    app: datahub-kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datahub-kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: datahub-kafka-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: datahub-kafka-consumer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+              name: health
+          envFrom:
+            - configMapRef:
+                name: datahub-kafka-consumer-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
