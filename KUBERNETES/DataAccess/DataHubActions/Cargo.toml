@@ -11,10 +11,11 @@ path = "src/main.rs"
 # Async runtime
 tokio = { version = "1", features = ["full"] }
 
-# Kafka — dynamic-linking links against the system-installed librdkafka (no C compilation needed).
-# Requires: sudo apt-get install librdkafka-dev   (Ubuntu/Debian)
-#           brew install librdkafka               (macOS)
-rdkafka = { version = "0.36", features = ["dynamic-linking", "tokio"] }
+# Kafka — cmake-build compiles the bundled librdkafka 2.3.0 from source (no system library needed).
+# Requires: cmake + a C compiler on the build machine.
+#   Ubuntu/Debian: sudo apt-get install cmake build-essential libssl-dev pkg-config
+#   Windows:       winget install Kitware.CMake  (plus MSVC build tools)
+rdkafka = { version = "0.34", features = ["cmake-build", "tokio"] }
 
 # Avro decoding
 apache-avro = { version = "0.16", features = ["snappy"] }

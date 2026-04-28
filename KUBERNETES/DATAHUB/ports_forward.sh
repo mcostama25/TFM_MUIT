@@ -9,3 +9,7 @@ kubectl port-forward svc/nessie-service -n datahub1 19120:19120 &
 kubectl port-forward svc/minio-service -n datahub1 9001:9001 &
 
 kubectl port-forward svc/minio-service -n datahub1 9000:9000 &
+
+kubectl port-forward svc/prerequisites-kafka -n datahub1  9092:9092 &
+
+

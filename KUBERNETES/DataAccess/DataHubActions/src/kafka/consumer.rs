@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 use rdkafka::consumer::{Consumer, StreamConsumer};
-use rdkafka::ClientConfig;
+use rdkafka::{ClientConfig, Message};
 use tracing::{error, info, warn};
 
 use crate::avro::AvroDecoder;

@@ -66,7 +66,7 @@ impl AvroDecoder {
 
         let schema = self.get_schema(schema_id).await?;
         let avro_bytes = &payload[HEADER_LEN..];
-        let value = from_avro_datum(&schema, &mut avro_bytes.as_ref(), None)?;
+        let value = from_avro_datum(&schema, &mut &avro_bytes[..], None)?;
 
         Ok(value)
     }
