@@ -7,6 +7,12 @@ pub struct AppConfig {
     pub kafka: KafkaConfig,
     pub schema_registry: SchemaRegistryConfig,
     pub server: ServerConfig,
+    pub output: OutputConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct OutputConfig {
+    pub dcat_file: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]

@@ -472,7 +472,7 @@ def step8_nessie_branch_lifecycle(spark: SparkSession) -> None:
     else:
         print(f"  [WARN] Merge returned {resp.status_code}: {resp.text}\n")
 
-
+    # ── 9. Snapshot Inspection & time-travel ─────────────────────────────────────────────
 def step9_time_travel_and_metadata(spark: SparkSession) -> None:
     """Read-only: snapshot history, time-travel, files and manifests metadata."""
     banner(9, "Snapshot inspection & time-travel")

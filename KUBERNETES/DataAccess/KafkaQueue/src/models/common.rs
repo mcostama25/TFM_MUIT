@@ -58,4 +58,8 @@ pub struct Resource {
     pub dcterms_title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dcterms_description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owners: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub schema_fields: Option<Vec<String>>,
 }

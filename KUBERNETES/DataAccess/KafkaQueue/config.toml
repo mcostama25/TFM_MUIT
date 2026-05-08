@@ -15,3 +15,6 @@ url = "http://localhost:8080"
 
 [server]
 port = 3001
+
+[output]
+dcat_file = "dcat_output.ndjson"
