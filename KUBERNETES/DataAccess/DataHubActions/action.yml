@@ -1,0 +1,12 @@
+name: "DataHub Event Logger Action"
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "prerequisites-kafka:9092"
+      schema_registry_url: "http://datahub-datahub-gms:8080/schema-registry/api/"
+
+action:
+  type: "event_logger"
+  config:
+    output_path: "/data/eventLogs.mdjson"
