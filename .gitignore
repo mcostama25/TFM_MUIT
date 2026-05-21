@@ -4,7 +4,7 @@
 KUBERNETES/DATAHUB/ingestion/iceberg/k8sJobs/secret-datahub-token.yaml
 
 # Ingestion recipes that embed real API keys / tokens
-DOCKER/ingestion/AEMET.yaml
+
 KUBERNETES/DATAHUB/ingestion/iceberg/AEMET.yaml
 # Local runtime configs with embedded tokens
 KUBERNETES/DataAccess/GraphQL/HTTPClient/config.toml
@@ -24,3 +24,8 @@ KUBERNETES/DataAccess/OpenAPI/OpenAPI_files/swagger-ui.css
 # ── Local tooling ─────────────────────────────────────────────────────────────
 .claude/
 CLAUDE.md
+
+# ── envs ─────────────────────────────────────────────────
+DOCKER\.env.1
+DOCKER\.env.2
+DOCKER\.env.fede
