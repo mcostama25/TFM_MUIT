@@ -1,0 +1,43 @@
+source:
+  type: iceberg
+  config:
+    # Nom de la instància Iceberg dins DataHub
+    platform_instance: "local-iceberg"
+
+    # Catalog type: filesystem | hive | jdbc | rest | custom
+    catalog:
+      type: rest
+      name: "nessie-rest"
+
+      # Endpoint del catalog REST d’Iceberg (ex. iceberg-rest o Nessie amb Iceberg REST)
+      rest:
+        uri: "http://localhost:8181"   # adapta-ho: p.e. 8181 si uses tabulario/iceberg-rest
+
+      # Warehouse path on MinIO (el mateix que uses a Spark)
+      warehouse: "s3a://warehouse/"
+
+    # Config de S3/MinIO per llegir el warehouse
+    s3:
+      aws_access_key_id: "1vdq0rzskceRV2wchWoR"
+      aws_secret_access_key: "scXYs5jAbrnQP5BbD6qIsvs1CyucowsVOaiT6mHz"
+      endpoint_url: "http://localhost:9001"
+      region_name: "us-east-1"
+
+      # Per a MinIO: access path-style
+      use_path_style_endpoint: true
+
+    # Opcional: incloure tots els namespaces / bases de dades
+    include:
+      databases:
+        - "metadata_demo"   # la DB que vam crear amb l’SQL
+      tables:
+        - "metadata_demo.*"
+
+    # Opcional: data profiling, si vols estadístiques (pot ser costós)
+    profile_table_level: false
+
+sink:
+  type: datahub-rest
+  config:
+    server: "http://localhost:8081"  # GMS via port-forward
+    token: ""                        # si tens auth, posa-hi el token

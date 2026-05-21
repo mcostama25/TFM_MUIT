@@ -106,7 +106,7 @@ acryl-datahub-actions:
   enabled: true
   image:
     repository: marticosta/datahub-actions-custom
-    tag: "v1.3.2.2"
+    tag: "v1.3.0.2"
   extraVolumes:
     - name: actions-config
       configMap:
@@ -118,6 +118,9 @@ acryl-datahub-actions:
     - name: actions-config
       mountPath: /etc/datahub/actions/conf/action.yml
       subPath: action.yml
+    - name: actions-config
+      mountPath: /etc/datahub/actions/conf/dcat_forwarder.yml
+      subPath: dcat_forwarder.yml
     - name: event-logs
       mountPath: /data
   # mount the k8s secret as a volume in the container, each key name is mounted as a file on the mount path /etc/datahub/ingestion-secret-files

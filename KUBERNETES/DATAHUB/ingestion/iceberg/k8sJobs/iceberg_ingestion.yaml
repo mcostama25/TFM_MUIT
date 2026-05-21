@@ -31,4 +31,4 @@ data:
       type: "datahub-rest"
       config:
         server: "http://datahub-datahub-gms:8080"
-        token: "eyJhbGciOiJIUzI1NiJ9.eyJhY3RvclR5cGUiOiJVU0VSIiwiYWN0b3JJZCI6ImRhdGFodWIiLCJ0eXBlIjoiUEVSU09OQUwiLCJ2ZXJzaW9uIjoiMiIsImp0aSI6IjQxZjU2YjIyLWFiNjMtNDNjNS05NDZhLTVlNmVjYWE2MTU1YyIsInN1YiI6ImRhdGFodWIiLCJleHAiOjE3ODA5MTg5OTYsImlzcyI6ImRhdGFodWItbWV0YWRhdGEtc2VydmljZSJ9.44qEpDXwzRu7fpLCDKChTReVKnLyLWO1LMRgnSpa42g"
+        token: ${DATAHUB_TOKEN}

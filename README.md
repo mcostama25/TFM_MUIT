@@ -95,7 +95,7 @@ The script will take **10–30 minutes** on first run because it downloads all H
    - `datahub-auth-secrets` — auto-generated signing keys for the DataHub token service
 6. Creates a `datahub-operator-sa` ServiceAccount with `cluster-admin` privileges (required by the DataHub system-update Helm hook)
 7. Runs `helm install prerequisites` (MySQL, Elasticsearch, Kafka, Neo4j, Zookeeper)
-8. Runs `helm install datahub` using `helm/values.yaml` and `helm/prerequisites/values.yaml`
+8. Runs `helm install datahub` using `helm/values.yaml`
 
 ### Verify deployment
 

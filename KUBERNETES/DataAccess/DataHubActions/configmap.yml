@@ -17,3 +17,17 @@ data:
       type: "event_logger"
       config:
         output_path: "/data/eventLogs.mdjson"
+  
+  dcat_forwarder.yml: |
+    name: "DCAT Forwarder Action"
+    source:
+      type: "kafka"
+      config:
+        connection:
+          bootstrap: "prerequisites-kafka:9092"
+          schema_registry_url: "http://datahub-datahub-gms:8080/schema-registry/api/"
+
+    action:
+      type: "dcat_forwarder"
+      config:
+        server_url: "http://10.0.2.15:8080"

@@ -1,0 +1,138 @@
+# --- CONFIGMAP PER A NESSIE ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nessie-config
+  namespace: datahub1
+data:
+  application.properties: |
+    nessie.version.store.type=IN_MEMORY
+    nessie.catalog.default-warehouse=default
+    nessie.catalog.warehouses.default.location=s3://warehouse/
+    nessie.catalog.service.s3.default-options.endpoint=http://minio-service:9000
+    nessie.catalog.service.s3.default-options.path-style-access=true
+    nessie.catalog.service.s3.default-options.region=us-east-1
+    nessie.catalog.service.s3.default-options.request-signing-enabled=false
+    # ✅ Reference the secret by URN
+    nessie.catalog.service.s3.default-options.access-key=urn:nessie-secret:quarkus:minio-creds
+    # ✅ Define the secret inline (Quarkus picks these up as config properties)
+    minio-creds.name=admin
+    minio-creds.secret=password
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: datahub1
+
+---
+
+# --- MINIO: STORAGE PER A LES DADES D'ICEBERG ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: datahub1
+  labels:
+    app: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:RELEASE.2024-01-28T22-35-53Z
+        args: ["server", "/data", "--console-address", ":9001"]
+        ports:
+          - containerPort: 9000
+            name: api
+          - containerPort: 9001
+            name: console
+        env:
+          - name: MINIO_ROOT_USER
+            value: "admin"
+          - name: MINIO_ROOT_PASSWORD
+            value: "password"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+  namespace: datahub1
+spec:
+  type: ClusterIP
+  selector:
+    app: minio
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 9000
+    - name: console
+      port: 9001
+      targetPort: 9001
+
+---
+
+# --- NESSIE: CATÀLEG REST PER A ICEBERG ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nessie
+  namespace: datahub1
+  labels:
+    app: nessie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nessie
+  template:
+    metadata:
+      labels:
+        app: nessie
+    spec:
+      containers:
+        - name: nessie
+          image: ghcr.io/projectnessie/nessie:0.103.0
+          ports:
+            - containerPort: 19120
+              name: http
+          env:
+            - name: QUARKUS_CONFIG_LOCATIONS
+              value: "/config/application.properties"
+            - name: AWS_ACCESS_KEY_ID
+              value: "admin"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "password"
+            - name: AWS_REGION
+              value: "us-east-1"
+          volumeMounts:
+            - name: nessie-config-volume
+              mountPath: /config
+      volumes:
+        - name: nessie-config-volume
+          configMap:
+            name: nessie-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nessie-service
+  namespace: datahub1
+spec:
+  type: ClusterIP
+  selector:
+    app: nessie
+  ports:
+    - protocol: TCP
+      port: 19120
+      targetPort: 19120
+      name: http

@@ -8,6 +8,7 @@ setup(
     entry_points={
         "datahub_actions.action.plugins": [
             "event_logger = event_logger.action:EventLoggerAction",
+            "dcat_forwarder = dcat_forwarder.action:DcatForwardAction",
         ],
     },
 )
