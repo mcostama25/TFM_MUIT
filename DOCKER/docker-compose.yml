@@ -3,24 +3,6 @@ networks:
     name: datahub_network-${INSTANCE}
 
 services:
-  zookeeper:
-    environment:
-    - ZOOKEEPER_CLIENT_PORT=2181
-    - ZOOKEEPER_TICK_TIME=2000
-    healthcheck:
-      interval: 5s
-      retries: 3
-      start_period: 30s
-      test: echo srvr | nc zookeeper 2181
-      timeout: 5s
-    hostname: zookeeper
-    image: ${DATAHUB_CONFLUENT_ZOOKEEPER_IMAGE:-confluentinc/cp-zookeeper}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
-    ports:
-    - ${ZK_PORT}:2181
-    volumes:
-    - zkdata:/var/lib/zookeeper/data
-    - zklogs:/var/lib/zookeeper/log
-
   broker:
     depends_on:
       zookeeper:
@@ -40,72 +22,149 @@ services:
       interval: 1s
       retries: 5
       start_period: 60s
-      test: nc -z broker 9092
+      test: nc -z broker ${KAFKA_EXTERNAL_PORT}
       timeout: 5s
     hostname: broker
     image: ${DATAHUB_CONFLUENT_KAFKA_IMAGE:-confluentinc/cp-kafka}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
+    networks:
+      default:
+        aliases:
+          - broker-${INSTANCE}
     ports:
     - ${KAFKA_EXTERNAL_PORT}:9092
     volumes:
     - broker_data:/var/lib/kafka/data/
 
-  schema-registry:
+  datahub-actions:
     depends_on:
-      broker:
+      datahub-gms:
         condition: service_healthy
     environment:
-    - SCHEMA_REGISTRY_HOST_NAME=schema-registry
-    - SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL=PLAINTEXT
-    - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=broker:29092
+    - ACTIONS_CONFIG=${ACTIONS_CONFIG:-}
+    - ACTIONS_EXTRA_PACKAGES=${ACTIONS_EXTRA_PACKAGES:-}
+    - DATAHUB_GMS_HOST=datahub-gms
+    - DATAHUB_GMS_PORT=8080 # puerto interni de gms
+    - DATAHUB_GMS_PROTOCOL=http
+    - DATAHUB_SYSTEM_CLIENT_ID=__datahub_system
+    - DATAHUB_SYSTEM_CLIENT_SECRET=${DATAHUB_TOKEN}
+    - KAFKA_BOOTSTRAP_SERVER=broker:29092
+    - KAFKA_PROPERTIES_SECURITY_PROTOCOL=PLAINTEXT
+    - METADATA_AUDIT_EVENT_NAME=MetadataAuditEvent_v4
+    - METADATA_CHANGE_LOG_VERSIONED_TOPIC_NAME=MetadataChangeLog_Versioned_v1
+    - SCHEMA_REGISTRY_URL=http://schema-registry:8081
+    hostname: datahub-actions
+    image: ${DATAHUB_ACTIONS_IMAGE:-acryldata/datahub-actions}:${DATAHUB_VERSION:-head}-slim
+
+  datahub-frontend-react:
+    depends_on:
+      datahub-gms:
+        condition: service_healthy
+    environment:
+    - DATAHUB_GMS_HOST=datahub-gms
+    - DATAHUB_GMS_PORT=8080 # puerto interno de gms
+    - DATAHUB_SECRET=${DATAHUB_SECRET}
+    - DATAHUB_SYSTEM_CLIENT_ID=__datahub_system
+    - DATAHUB_SYSTEM_CLIENT_SECRET=${DATAHUB_TOKEN}
+    - DATAHUB_APP_VERSION=${DATAHUB_VERSION:-v1.0.0}
+    - DATAHUB_PLAY_MEM_BUFFER_SIZE=10MB
+    - JAVA_OPTS=-Xms512m -Xmx512m -Dhttp.port=9002 -Dconfig.file=datahub-frontend/conf/application.conf -Djava.security.auth.login.config=datahub-frontend/conf/jaas.conf -Dlogback.configurationFile=datahub-frontend/conf/logback.xml -Dlogback.debug=false -Dpidfile.path=/dev/null
+    - KAFKA_BOOTSTRAP_SERVER=broker:29092
+    - DATAHUB_TRACKING_TOPIC=DataHubUsageEvent_v1
+    - ELASTIC_CLIENT_HOST=elasticsearch
+    - ELASTIC_CLIENT_PORT=9200
+    hostname: datahub-frontend-react
+    image: ${DATAHUB_FRONTEND_IMAGE:-acryldata/datahub-frontend-react}:${DATAHUB_VERSION:-head}
+    ports:
+    - ${FRONTEND_PORT}:9002
+    volumes:
+    - ${HOME}/.datahub/plugins:/etc/datahub/plugins
+
+  datahub-gms:
+    depends_on:
+      datahub-upgrade:
+        condition: service_completed_successfully
+    environment:
+    - DATAHUB_SERVER_TYPE=${DATAHUB_SERVER_TYPE:-quickstart}
+    - DATAHUB_TELEMETRY_ENABLED=${DATAHUB_TELEMETRY_ENABLED:-true}
+    - DATAHUB_UPGRADE_HISTORY_KAFKA_CONSUMER_GROUP_ID=generic-duhe-consumer-job-client-gms
+    - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
+    - EBEAN_DATASOURCE_HOST=mysql:3306
+    - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+    - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8
+    - EBEAN_DATASOURCE_USERNAME=${MYSQL_USER}
+    - ELASTICSEARCH_HOST=elasticsearch
+    - ELASTICSEARCH_INDEX_BUILDER_MAPPINGS_REINDEX=true
+    - ELASTICSEARCH_INDEX_BUILDER_SETTINGS_REINDEX=true
+    - ELASTICSEARCH_PORT=9200
+    - ENTITY_REGISTRY_CONFIG_PATH=/datahub/datahub-gms/resources/entity-registry.yml
+    - ENTITY_SERVICE_ENABLE_RETENTION=true
+    - ES_BULK_REFRESH_POLICY=WAIT_UNTIL
+    - GRAPH_SERVICE_DIFF_MODE_ENABLED=true
+    - GRAPH_SERVICE_IMPL=elasticsearch
+    - JAVA_OPTS=-Xms1g -Xmx1g
+    - KAFKA_BOOTSTRAP_SERVER=broker:29092
+    - KAFKA_CONSUMER_STOP_ON_DESERIALIZATION_ERROR=${KAFKA_CONSUMER_STOP_ON_DESERIALIZATION_ERROR:-true}
+    - KAFKA_SCHEMAREGISTRY_URL=http://schema-registry:8081
+    - MAE_CONSUMER_ENABLED=true
+    - MCE_CONSUMER_ENABLED=true
+    - METADATA_SERVICE_AUTH_ENABLED=${METADATA_SERVICE_AUTH_ENABLED:-false}
+    - PE_CONSUMER_ENABLED=true
+    - THEME_V2_DEFAULT=true
+    - UI_INGESTION_ENABLED=true
+    - DATAHUB_GMS_PROTOCOL=http
+    - DATAHUB_GMS_HOST=datahub-gms
+    - DATAHUB_GMS_PORT=8080
+    - DATAHUB_TOKEN_SERVICE_SIGNING_KEY=${DATAHUB_TOKEN}
     healthcheck:
       interval: 1s
       retries: 3
-      start_period: 60s
-      test: nc -z schema-registry 8081
+      start_period: 90s
+      test: curl -sS --fail http://datahub-gms:8080/health
       timeout: 5s
-    hostname: schema-registry
-    image: ${DATAHUB_CONFLUENT_SCHEMA_REGISTRY_IMAGE:-confluentinc/cp-schema-registry}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
+    hostname: datahub-gms
+    image: ${DATAHUB_GMS_IMAGE:-acryldata/datahub-gms}:${DATAHUB_VERSION:-head}
+    networks:
+      default:
+        aliases:
+          - datahub-gms-${INSTANCE}
     ports:
-    - ${SR_PORT}:8081
-
-  mysql:
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --default-authentication-plugin=mysql_native_password
-    environment:
-    - MYSQL_DATABASE=datahub
-    - MYSQL_USER=${MYSQL_USER}
-    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-    - MYSQL_ROOT_HOST=%
-    healthcheck:
-      interval: 1s
-      retries: 5
-      start_period: 20s
-      test: mysqladmin ping -h mysql -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
-      timeout: 5s
-    hostname: mysql
-    image: mariadb:10.5.8
-    ports:
-    - ${MYSQL_PORT}:3306
-    restart: on-failure
+    - ${GMS_PORT}:8080
     volumes:
-    - mysqldata:/var/lib/mysql
+    - ${HOME}/.datahub/plugins:/etc/datahub/plugins
 
-  mysql-setup:
+  datahub-upgrade:
+    command:
+    - -u
+    - SystemUpdate
     depends_on:
-      mysql:
-        condition: service_healthy
+      elasticsearch-setup:
+        condition: service_completed_successfully
+      kafka-setup:
+        condition: service_completed_successfully
+      mysql-setup:
+        condition: service_completed_successfully
     environment:
-    - MYSQL_HOST=mysql
-    - MYSQL_PORT=3306
-    - MYSQL_USERNAME=${MYSQL_USER}
-    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    - DATAHUB_DB_NAME=datahub
-    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-    - CDC_MCL_PROCESSING_ENABLED=false
-    - CDC_USER=datahub_cdc
-    - CDC_PASSWORD=datahub_cdc
-    hostname: mysql-setup
-    image: ${DATAHUB_MYSQL_SETUP_IMAGE:-acryldata/datahub-mysql-setup}:${DATAHUB_VERSION:-head}
+    - EBEAN_DATASOURCE_USERNAME=${MYSQL_USER}
+    - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+    - EBEAN_DATASOURCE_HOST=mysql:3306
+    - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8
+    - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
+    - KAFKA_BOOTSTRAP_SERVER=broker:29092
+    - KAFKA_SCHEMAREGISTRY_URL=http://schema-registry:8081
+    - ELASTICSEARCH_HOST=elasticsearch
+    - ELASTICSEARCH_PORT=9200
+    - ELASTICSEARCH_INDEX_BUILDER_MAPPINGS_REINDEX=true
+    - ELASTICSEARCH_INDEX_BUILDER_SETTINGS_REINDEX=true
+    - ELASTICSEARCH_BUILD_INDICES_CLONE_INDICES=false
+    - GRAPH_SERVICE_IMPL=elasticsearch
+    - DATAHUB_GMS_HOST=datahub-gms
+    - DATAHUB_GMS_PORT=8080
+    - ENTITY_REGISTRY_CONFIG_PATH=/datahub/datahub-gms/resources/entity-registry.yml
+    - BACKFILL_BROWSE_PATHS_V2=true
+    - REPROCESS_DEFAULT_BROWSE_PATHS_V2=false
+    - METADATA_SERVICE_AUTH_ENABLED=false
+    hostname: datahub-upgrade
+    image: ${DATAHUB_UPGRADE_IMAGE:-acryldata/datahub-upgrade}:${DATAHUB_VERSION:-head}
     labels:
       datahub_setup_job: true
 
@@ -161,135 +220,95 @@ services:
     labels:
       datahub_setup_job: true
 
-  datahub-upgrade:
-    command:
-    - -u
-    - SystemUpdate
-    depends_on:
-      elasticsearch-setup:
-        condition: service_completed_successfully
-      kafka-setup:
-        condition: service_completed_successfully
-      mysql-setup:
-        condition: service_completed_successfully
+  mysql:
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --default-authentication-plugin=mysql_native_password
     environment:
-    - EBEAN_DATASOURCE_USERNAME=${MYSQL_USER}
-    - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-    - EBEAN_DATASOURCE_HOST=mysql:3306
-    - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8
-    - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
-    - KAFKA_BOOTSTRAP_SERVER=broker:29092
-    - KAFKA_SCHEMAREGISTRY_URL=http://schema-registry:8081
-    - ELASTICSEARCH_HOST=elasticsearch
-    - ELASTICSEARCH_PORT=9200
-    - ELASTICSEARCH_INDEX_BUILDER_MAPPINGS_REINDEX=true
-    - ELASTICSEARCH_INDEX_BUILDER_SETTINGS_REINDEX=true
-    - ELASTICSEARCH_BUILD_INDICES_CLONE_INDICES=false
-    - GRAPH_SERVICE_IMPL=elasticsearch
-    - DATAHUB_GMS_HOST=datahub-gms
-    - DATAHUB_GMS_PORT=8080
-    - ENTITY_REGISTRY_CONFIG_PATH=/datahub/datahub-gms/resources/entity-registry.yml
-    - BACKFILL_BROWSE_PATHS_V2=true
-    - REPROCESS_DEFAULT_BROWSE_PATHS_V2=false
-    - METADATA_SERVICE_AUTH_ENABLED=false
-    hostname: datahub-upgrade
-    image: ${DATAHUB_UPGRADE_IMAGE:-acryldata/datahub-upgrade}:${DATAHUB_VERSION:-head}
+    - MYSQL_DATABASE=datahub
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    - MYSQL_ROOT_HOST=%
+    healthcheck:
+      interval: 1s
+      retries: 5
+      start_period: 20s
+      test: mysqladmin ping -h mysql -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      timeout: 5s
+    hostname: mysql
+    image: mariadb:10.5.8
+    networks:
+      default:
+        aliases:
+          - mysql-${INSTANCE}
+    ports:
+    - ${MYSQL_PORT}:3306
+    restart: on-failure
+    volumes:
+    - mysqldata:/var/lib/mysql
+
+  mysql-setup:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+    - MYSQL_HOST=mysql
+    - MYSQL_PORT=3306
+    - MYSQL_USERNAME=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - DATAHUB_DB_NAME=datahub
+    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    - CDC_MCL_PROCESSING_ENABLED=false
+    - CDC_USER=datahub_cdc
+    - CDC_PASSWORD=datahub_cdc
+    hostname: mysql-setup
+    image: ${DATAHUB_MYSQL_SETUP_IMAGE:-acryldata/datahub-mysql-setup}:${DATAHUB_VERSION:-head}
     labels:
       datahub_setup_job: true
 
-  datahub-gms:
+  schema-registry:
     depends_on:
-      datahub-upgrade:
-        condition: service_completed_successfully
+      broker:
+        condition: service_healthy
     environment:
-    - DATAHUB_SERVER_TYPE=${DATAHUB_SERVER_TYPE:-quickstart}
-    - DATAHUB_TELEMETRY_ENABLED=${DATAHUB_TELEMETRY_ENABLED:-true}
-    - DATAHUB_UPGRADE_HISTORY_KAFKA_CONSUMER_GROUP_ID=generic-duhe-consumer-job-client-gms
-    - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
-    - EBEAN_DATASOURCE_HOST=mysql:3306
-    - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-    - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8
-    - EBEAN_DATASOURCE_USERNAME=${MYSQL_USER}
-    - ELASTICSEARCH_HOST=elasticsearch
-    - ELASTICSEARCH_INDEX_BUILDER_MAPPINGS_REINDEX=true
-    - ELASTICSEARCH_INDEX_BUILDER_SETTINGS_REINDEX=true
-    - ELASTICSEARCH_PORT=9200
-    - ENTITY_REGISTRY_CONFIG_PATH=/datahub/datahub-gms/resources/entity-registry.yml
-    - ENTITY_SERVICE_ENABLE_RETENTION=true
-    - ES_BULK_REFRESH_POLICY=WAIT_UNTIL
-    - GRAPH_SERVICE_DIFF_MODE_ENABLED=true
-    - GRAPH_SERVICE_IMPL=elasticsearch
-    - JAVA_OPTS=-Xms1g -Xmx1g
-    - KAFKA_BOOTSTRAP_SERVER=broker:29092
-    - KAFKA_CONSUMER_STOP_ON_DESERIALIZATION_ERROR=${KAFKA_CONSUMER_STOP_ON_DESERIALIZATION_ERROR:-true}
-    - KAFKA_SCHEMAREGISTRY_URL=http://schema-registry:8081
-    - MAE_CONSUMER_ENABLED=true
-    - MCE_CONSUMER_ENABLED=true
-    - METADATA_SERVICE_AUTH_ENABLED=${METADATA_SERVICE_AUTH_ENABLED:-false}
-    - PE_CONSUMER_ENABLED=true
-    - THEME_V2_DEFAULT=true
-    - UI_INGESTION_ENABLED=true
-    - DATAHUB_GMS_PROTOCOL=http
-    - DATAHUB_GMS_HOST=datahub-gms
-    - DATAHUB_GMS_PORT=8080
+    - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+    - SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL=PLAINTEXT
+    - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=broker:29092
     healthcheck:
       interval: 1s
       retries: 3
-      start_period: 90s
-      test: curl -sS --fail http://datahub-gms:8080/health
+      start_period: 60s
+      test: nc -z schema-registry 8081
       timeout: 5s
-    hostname: datahub-gms
-    image: ${DATAHUB_GMS_IMAGE:-acryldata/datahub-gms}:${DATAHUB_VERSION:-head}
+    hostname: schema-registry
+    image: ${DATAHUB_CONFLUENT_SCHEMA_REGISTRY_IMAGE:-confluentinc/cp-schema-registry}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
+    networks:
+      default:
+        aliases:
+          - schema-registry-${INSTANCE}
     ports:
-    - ${GMS_PORT}:8080
-    volumes:
-    - ${HOME}/.datahub/plugins:/etc/datahub/plugins
+    - ${SR_PORT}:8081
 
-  datahub-frontend-react:
-    depends_on:
-      datahub-gms:
-        condition: service_healthy
+  zookeeper:
     environment:
-    - DATAHUB_GMS_HOST=datahub-gms
-    - DATAHUB_GMS_PORT=8080
-    - DATAHUB_SECRET=YouKnowNothing
-    - DATAHUB_APP_VERSION=${DATAHUB_VERSION:-v1.0.0}
-    - DATAHUB_PLAY_MEM_BUFFER_SIZE=10MB
-    - JAVA_OPTS=-Xms512m -Xmx512m -Dhttp.port=9002 -Dconfig.file=datahub-frontend/conf/application.conf -Djava.security.auth.login.config=datahub-frontend/conf/jaas.conf -Dlogback.configurationFile=datahub-frontend/conf/logback.xml -Dlogback.debug=false -Dpidfile.path=/dev/null
-    - KAFKA_BOOTSTRAP_SERVER=broker:29092
-    - DATAHUB_TRACKING_TOPIC=DataHubUsageEvent_v1
-    - ELASTIC_CLIENT_HOST=elasticsearch
-    - ELASTIC_CLIENT_PORT=9200
-    hostname: datahub-frontend-react
-    image: ${DATAHUB_FRONTEND_IMAGE:-acryldata/datahub-frontend-react}:${DATAHUB_VERSION:-head}
+    - ZOOKEEPER_CLIENT_PORT=2181
+    - ZOOKEEPER_TICK_TIME=2000
+    healthcheck:
+      interval: 5s
+      retries: 3
+      start_period: 30s
+      test: echo srvr | nc zookeeper 2181
+      timeout: 5s
+    hostname: zookeeper
+    image: ${DATAHUB_CONFLUENT_ZOOKEEPER_IMAGE:-confluentinc/cp-zookeeper}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
     ports:
-    - ${FRONTEND_PORT}:9002
+    - ${ZK_PORT}:2181
     volumes:
-    - ${HOME}/.datahub/plugins:/etc/datahub/plugins
-
-  datahub-actions:
-    depends_on:
-      datahub-gms:
-        condition: service_healthy
-    environment:
-    - ACTIONS_CONFIG=${ACTIONS_CONFIG:-}
-    - ACTIONS_EXTRA_PACKAGES=${ACTIONS_EXTRA_PACKAGES:-}
-    - DATAHUB_GMS_HOST=datahub-gms
-    - DATAHUB_GMS_PORT=8080
-    - DATAHUB_GMS_PROTOCOL=http
-    - DATAHUB_SYSTEM_CLIENT_ID=__datahub_system
-    - DATAHUB_SYSTEM_CLIENT_SECRET=${DATAHUB_TOKEN}
-    - KAFKA_BOOTSTRAP_SERVER=broker:29092
-    - KAFKA_PROPERTIES_SECURITY_PROTOCOL=PLAINTEXT
-    - METADATA_AUDIT_EVENT_NAME=MetadataAuditEvent_v4
-    - METADATA_CHANGE_LOG_VERSIONED_TOPIC_NAME=MetadataChangeLog_Versioned_v1
-    - SCHEMA_REGISTRY_URL=http://schema-registry:8081
-    hostname: datahub-actions
-    image: ${DATAHUB_ACTIONS_IMAGE:-acryldata/datahub-actions}:${DATAHUB_VERSION:-head}-slim
+    - zkdata:/var/lib/zookeeper/data
+    - zklogs:/var/lib/zookeeper/log
 
 volumes:
-  broker_data:
-  esdata:
-  mysqldata:
-  zkdata:
-  zklogs:
+  broker_data: null
+  esdata: null
+  mysqldata: null
+  zkdata: null
+  zklogs: null

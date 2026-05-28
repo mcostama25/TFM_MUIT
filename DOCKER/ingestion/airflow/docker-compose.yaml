@@ -1,0 +1,102 @@
+services:
+  postgres:
+    image: postgres:13
+    container_name: airflow-postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - airflow_postgres:/var/lib/postgresql/data
+    networks:
+      - airflow_internal
+
+  # --- AIRFLOW WEBSERVER ---
+  airflow-webserver:
+    build: .
+    container_name: airflow-webserver
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    user: "1000:0"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-webserver:8080/execution/"
+      AIRFLOW__LOGGING__LOG_SERVER_HOSTNAME: "127.0.0.1"
+      PATH: "/home/airflow/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      PYTHONPATH: "/home/airflow/.local/lib/python3.11/site-packages"
+    networks:
+      - airflow_internal
+      - datahub_network-1
+      - datahub_network-2
+      - datahub_network-fede
+    ports:
+      - "8086:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./recipes:/opt/airflow/recipes
+      - airflow_logs:/opt/airflow/logs  # CHANGED: Now using isolated docker volume to fix Windows colon error
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create
+      --role Admin
+      --username admin
+      --password admin
+      --firstname admin
+      --lastname admin
+      --email admin@example.com ;
+      airflow webserver
+      "
+
+  # --- AIRFLOW SCHEDULER ---
+  airflow-scheduler:
+    build: .
+    container_name: airflow-scheduler
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    user: "1000:0"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-webserver:8080/execution/"
+      AIRFLOW__LOGGING__LOG_SERVER_HOSTNAME: "127.0.0.1"
+      PATH: "/home/airflow/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      PYTHONPATH: "/home/airflow/.local/lib/python3.11/site-packages"
+    networks:
+      - airflow_internal
+      - datahub_network-1
+      - datahub_network-2
+      - datahub_network-fede
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./recipes:/opt/airflow/recipes
+      - airflow_logs:/opt/airflow/logs  # CHANGED: Now using isolated docker volume to fix Windows colon error
+    command: airflow scheduler
+
+volumes:
+  airflow_postgres:
+  airflow_logs: # NEW: Named volume that bypasses host filesystem limitations
+
+networks:
+  airflow_internal:
+  datahub_network-1:
+    external: true
+    name: datahub_network-1
+  datahub_network-2:
+    external: true
+    name: datahub_network-2
+  datahub_network-fede:
+    external: true
+    name: datahub_network-fede

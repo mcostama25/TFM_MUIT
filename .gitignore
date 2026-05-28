@@ -29,3 +29,5 @@ CLAUDE.md
 DOCKER\.env.1
 DOCKER\.env.2
 DOCKER\.env.fede
+
+__pycache__/

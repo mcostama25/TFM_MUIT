@@ -7,4 +7,4 @@ source:
 sink:
   type: datahub-rest
   config:
-    server: "http://localhost:8082" # port de Localhost a GMS /DataHub2
+    server: "http://localhost:8080" # port de Localhost a GMS /DataHub2

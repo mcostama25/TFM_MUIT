@@ -1,0 +1,108 @@
+	<TaskInstance: datahub_periodic_ingestion.ingest_from_datahub manual__2026-05-26T08:46:49.436840+00:00 [scheduled]>
+[2026-05-26T08:46:50.501+0000] {scheduler_job_runner.py:748} INFO - Trying to enqueue tasks: [<TaskInstance: datahub_periodic_ingestion.ingest_from_datahub scheduled__2026-05-26T08:00:00+00:00 [scheduled]>, <TaskInstance: datahub_periodic_ingestion.ingest_from_datahub manual__2026-05-26T08:46:49.436840+00:00 [scheduled]>] for executor: LocalExecutor(parallelism=32)
+[2026-05-26T08:46:50.501+0000] {scheduler_job_runner.py:692} INFO - Sending TaskInstanceKey(dag_id='datahub_periodic_ingestion', task_id='ingest_from_datahub', run_id='scheduled__2026-05-26T08:00:00+00:00', try_number=1, map_index=-1) to LocalExecutor with priority 1 and queue default
+[2026-05-26T08:46:50.505+0000] {base_executor.py:169} INFO - Adding to queue: ['airflow', 'tasks', 'run', 'datahub_periodic_ingestion', 'ingest_from_datahub', 'scheduled__2026-05-26T08:00:00+00:00', '--local', '--subdir', 'DAGS_FOLDER/datagub_ingestion.py']
+[2026-05-26T08:46:50.506+0000] {scheduler_job_runner.py:692} INFO - Sending TaskInstanceKey(dag_id='datahub_periodic_ingestion', task_id='ingest_from_datahub', run_id='manual__2026-05-26T08:46:49.436840+00:00', try_number=1, map_index=-1) to LocalExecutor with priority 1 and queue default
+[2026-05-26T08:46:50.506+0000] {base_executor.py:169} INFO - Adding to queue: ['airflow', 'tasks', 'run', 'datahub_periodic_ingestion', 'ingest_from_datahub', 'manual__2026-05-26T08:46:49.436840+00:00', '--local', '--subdir', 'DAGS_FOLDER/datagub_ingestion.py']
+[2026-05-26T08:46:50.515+0000] {local_executor.py:93} INFO - QueuedLocalWorker running ['airflow', 'tasks', 'run', 'datahub_periodic_ingestion', 'ingest_from_datahub', 'scheduled__2026-05-26T08:00:00+00:00', '--local', '--subdir', 'DAGS_FOLDER/datagub_ingestion.py']
+[2026-05-26T08:46:50.518+0000] {local_executor.py:93} INFO - QueuedLocalWorker running ['airflow', 'tasks', 'run', 'datahub_periodic_ingestion', 'ingest_from_datahub', 'manual__2026-05-26T08:46:49.436840+00:00', '--local', '--subdir', 'DAGS_FOLDER/datagub_ingestion.py']
+[2026-05-26T08:46:50.569+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/***/dags/datagub_ingestion.py
+[2026-05-26T08:46:50.596+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/***/dags/datagub_ingestion.py
+[2026-05-26T08:46:50.648+0000] {local_executor.py:146} ERROR - Failed to execute task [Errno 2] No such file or directory: '/opt/airflow/logs/dag_id=datahub_periodic_ingestion/run_id=manual__2026-05-26T08:46:49.436840+00:00'.
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/executors/local_executor.py", line 142, in _execute_work_in_fork
+    args.func(args)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/cli_config.py", line 49, in command
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/cli.py", line 116, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 463, in task_run
+    ti.init_run_context(raw=args.raw)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3727, in init_run_context
+    self._set_context(self)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/logging_mixin.py", line 129, in _set_context
+    set_context(self.log, context)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/logging_mixin.py", line 276, in set_context
+    flag = cast(FileTaskHandler, handler).set_context(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/file_task_handler.py", line 242, in set_context
+    local_loc = self._init_file(ti, identifier=identifier)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/file_task_handler.py", line 574, in _init_file
+    self._prepare_log_folder(Path(full_path).parent, new_folder_permissions)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/file_task_handler.py", line 548, in _prepare_log_folder
+    parent.mkdir(mode=new_folder_permissions, exist_ok=True)
+  File "/usr/local/lib/python3.11/pathlib.py", line 1116, in mkdir
+    os.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/airflow/logs/dag_id=datahub_periodic_ingestion/run_id=manual__2026-05-26T08:46:49.436840+00:00'
+[2026-05-26T08:46:50.692+0000] {local_executor.py:146} ERROR - Failed to execute task [Errno 2] No such file or directory: '/opt/airflow/logs/dag_id=datahub_periodic_ingestion/run_id=scheduled__2026-05-26T08:00:00+00:00'.
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/executors/local_executor.py", line 142, in _execute_work_in_fork
+    args.func(args)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/cli_config.py", line 49, in command
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/cli.py", line 116, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 463, in task_run
+    ti.init_run_context(raw=args.raw)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3727, in init_run_context
+    self._set_context(self)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/logging_mixin.py", line 129, in _set_context
+    set_context(self.log, context)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/logging_mixin.py", line 276, in set_context
+    flag = cast(FileTaskHandler, handler).set_context(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/file_task_handler.py", line 242, in set_context
+    local_loc = self._init_file(ti, identifier=identifier)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/file_task_handler.py", line 574, in _init_file
+    self._prepare_log_folder(Path(full_path).parent, new_folder_permissions)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/log/file_task_handler.py", line 548, in _prepare_log_folder
+    parent.mkdir(mode=new_folder_permissions, exist_ok=True)
+  File "/usr/local/lib/python3.11/pathlib.py", line 1116, in mkdir
+    os.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/airflow/logs/dag_id=datahub_periodic_ingestion/run_id=scheduled__2026-05-26T08:00:00+00:00'
+[2026-05-26T08:46:51.624+0000] {scheduler_job_runner.py:776} INFO - Received executor event with state failed for task instance TaskInstanceKey(dag_id='datahub_periodic_ingestion', task_id='ingest_from_datahub', run_id='manual__2026-05-26T08:46:49.436840+00:00', try_number=1, map_index=-1)
+[2026-05-26T08:46:51.624+0000] {scheduler_job_runner.py:776} INFO - Received executor event with state failed for task instance TaskInstanceKey(dag_id='datahub_periodic_ingestion', task_id='ingest_from_datahub', run_id='scheduled__2026-05-26T08:00:00+00:00', try_number=1, map_index=-1)
+[2026-05-26T08:46:51.630+0000] {scheduler_job_runner.py:813} INFO - TaskInstance Finished: dag_id=datahub_periodic_ingestion, task_id=ingest_from_datahub, run_id=manual__2026-05-26T08:46:49.436840+00:00, map_index=-1, run_start_date=None, run_end_date=None, run_duration=None, state=queued, executor=LocalExecutor(parallelism=32), executor_state=failed, try_number=1, max_tries=0, job_id=None, pool=default_pool, queue=default, priority_weight=1, operator=BashOperator, queued_dttm=2026-05-26 08:46:50.500843+00:00, queued_by_job_id=50, pid=None
+[2026-05-26T08:46:51.630+0000] {scheduler_job_runner.py:922} ERROR - Executor LocalExecutor(parallelism=32) reported that the task instance <TaskInstance: datahub_periodic_ingestion.ingest_from_datahub manual__2026-05-26T08:46:49.436840+00:00 [queued]> finished with state failed, but the task instance's state attribute is queued. Learn more: https://airflow.apache.org/docs/apache-airflow/stable/troubleshooting.html#task-state-changed-externally
+[2026-05-26T08:46:51.635+0000] {taskinstance.py:3315} ERROR - Executor LocalExecutor(parallelism=32) reported that the task instance <TaskInstance: datahub_periodic_ingestion.ingest_from_datahub manual__2026-05-26T08:46:49.436840+00:00 [queued]> finished with state failed, but the task instance's state attribute is queued. Learn more: https://airflow.apache.org/docs/apache-airflow/stable/troubleshooting.html#task-state-changed-externally
+[2026-05-26T08:46:51.641+0000] {taskinstance.py:1226} INFO - Marking task as FAILED. dag_id=datahub_periodic_ingestion, task_id=ingest_from_datahub, run_id=manual__2026-05-26T08:46:49.436840+00:00, execution_date=20260526T084649, start_date=, end_date=20260526T084651
+[2026-05-26T08:46:51.653+0000] {scheduler_job_runner.py:813} INFO - TaskInstance Finished: dag_id=datahub_periodic_ingestion, task_id=ingest_from_datahub, run_id=scheduled__2026-05-26T08:00:00+00:00, map_index=-1, run_start_date=None, run_end_date=None, run_duration=None, state=queued, executor=LocalExecutor(parallelism=32), executor_state=failed, try_number=1, max_tries=0, job_id=None, pool=default_pool, queue=default, priority_weight=1, operator=BashOperator, queued_dttm=2026-05-26 08:46:50.500843+00:00, queued_by_job_id=50, pid=None
+[2026-05-26T08:46:51.653+0000] {scheduler_job_runner.py:922} ERROR - Executor LocalExecutor(parallelism=32) reported that the task instance <TaskInstance: datahub_periodic_ingestion.ingest_from_datahub scheduled__2026-05-26T08:00:00+00:00 [queued]> finished with state failed, but the task instance's state attribute is queued. Learn more: https://airflow.apache.org/docs/apache-airflow/stable/troubleshooting.html#task-state-changed-externally
+[2026-05-26T08:46:51.657+0000] {taskinstance.py:3315} ERROR - Executor LocalExecutor(parallelism=32) reported that the task instance <TaskInstance: datahub_periodic_ingestion.ingest_from_datahub scheduled__2026-05-26T08:00:00+00:00 [queued]> finished with state failed, but the task instance's state attribute is queued. Learn more: https://airflow.apache.org/docs/apache-airflow/stable/troubleshooting.html#task-state-changed-externally
+[2026-05-26T08:46:51.660+0000] {taskinstance.py:1226} INFO - Marking task as FAILED. dag_id=datahub_periodic_ingestion, task_id=ingest_from_datahub, run_id=scheduled__2026-05-26T08:00:00+00:00, execution_date=20260526T080000, start_date=, end_date=20260526T084651
+[2026-05-26T08:46:52.582+0000] {dagrun.py:823} ERROR - Marking run <DagRun datahub_periodic_ingestion @ 2026-05-26 08:00:00+00:00: scheduled__2026-05-26T08:00:00+00:00, state:running, queued_at: 2026-05-26 08:46:50.422842+00:00. externally triggered: False> failed
+[2026-05-26T08:46:52.582+0000] {dagrun.py:905} INFO - DagRun Finished: dag_id=datahub_periodic_ingestion, execution_date=2026-05-26 08:00:00+00:00, run_id=scheduled__2026-05-26T08:00:00+00:00, run_start_date=2026-05-26 08:46:50.458843+00:00, run_end_date=2026-05-26 08:46:52.582849+00:00, run_duration=2.124006, state=failed, external_trigger=False, run_type=scheduled, data_interval_start=2026-05-26 08:00:00+00:00, data_interval_end=2026-05-26 08:30:00+00:00, dag_hash=afc997da29dc82effbf7488a914ccfd5
+[2026-05-26T08:46:52.584+0000] {dag.py:4180} INFO - Setting next_dagrun for datahub_periodic_ingestion to 2026-05-26 08:30:00+00:00, run_after=2026-05-26 09:00:00+00:00
+[2026-05-26T08:46:52.587+0000] {dagrun.py:823} ERROR - Marking run <DagRun datahub_periodic_ingestion @ 2026-05-26 08:46:49.436840+00:00: manual__2026-05-26T08:46:49.436840+00:00, state:running, queued_at: 2026-05-26 08:46:49.503840+00:00. externally triggered: True> failed
+[2026-05-26T08:46:52.587+0000] {dagrun.py:905} INFO - DagRun Finished: dag_id=datahub_periodic_ingestion, execution_date=2026-05-26 08:46:49.436840+00:00, run_id=manual__2026-05-26T08:46:49.436840+00:00, run_start_date=2026-05-26 08:46:50.458843+00:00, run_end_date=2026-05-26 08:46:52.587849+00:00, run_duration=2.129006, state=failed, external_trigger=True, run_type=manual, data_interval_start=2026-05-26 08:16:49.436840+00:00, data_interval_end=2026-05-26 08:46:49.436840+00:00, dag_hash=afc997da29dc82effbf7488a914ccfd5
+[2026-05-26T08:47:00.586+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:47:31.004+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:48:01.890+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:48:32.426+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:49:03.009+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:49:33.543+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:50:03.777+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:50:28.576+0000] {scheduler_job_runner.py:1949} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2026-05-26T08:50:34.990+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:51:05.768+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:51:38.150+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:52:08.523+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:52:39.239+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:53:09.710+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:53:40.136+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:54:10.734+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:54:41.088+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:55:11.321+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:55:28.645+0000] {scheduler_job_runner.py:1949} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2026-05-26T08:55:42.159+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:56:13.193+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:56:44.523+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:57:21.319+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:57:51.906+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
+[2026-05-26T08:58:22.390+0000] {file_processor_handler.py:135} WARNING - OSError while attempting to symlink the latest log directory
