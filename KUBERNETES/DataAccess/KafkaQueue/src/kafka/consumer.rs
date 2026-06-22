@@ -8,6 +8,7 @@ use tracing::{error, info, warn};
 use crate::avro::AvroDecoder;
 use crate::config::KafkaConfig;
 use crate::error::AppError;
+use crate::http::HttpSender;
 use crate::kafka::handler::handle_event;
 use crate::store::StateStore;
 
@@ -35,6 +36,7 @@ pub async fn run_consumer_loop(
     topics: &[String],
     decoder: Arc<AvroDecoder>,
     mut store: StateStore,
+    http_sender: HttpSender,
 ) -> Result<(), AppError> {
     store.load_from_ndjson();
 
@@ -59,8 +61,12 @@ pub async fn run_consumer_loop(
 
                 match decoder.decode(payload).await {
                     Ok(avro_val) => {
-                        if handle_event(&topic, avro_val, &mut store) {
+                        let (changed, http_action) = handle_event(&topic, avro_val, &mut store);
+                        if changed {
                             store.flush();
+                        }
+                        if let Some(action) = http_action {
+                            http_sender.execute(&action).await;
                         }
                     }
                     Err(e) => {

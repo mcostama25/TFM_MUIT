@@ -3,6 +3,7 @@ mod config;
 mod datahub;
 mod error;
 mod health;
+mod http;
 mod kafka;
 mod models;
 mod store;
@@ -17,6 +18,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use avro::AvroDecoder;
 use health::health_router;
+use crate::http::HttpSender;
 use kafka::{build_consumer, run_consumer_loop};
 use store::StateStore;
 
@@ -42,11 +44,13 @@ async fn main() -> Result<()> {
         "Schema registry config loaded"
     );
     info!(dcat_file = %cfg.output.dcat_file, "DCAT3 output file configured");
+    info!(server_url = %cfg.http_sender.server_url, "HTTP sender configured");
 
     let decoder = Arc::new(AvroDecoder::new(&cfg.schema_registry.url));
     let consumer = build_consumer(&cfg.kafka)?;
     let topics = cfg.kafka.topics.clone();
     let store = StateStore::new(cfg.output.dcat_file.clone());
+    let http_sender = HttpSender::new(&cfg.http_sender.server_url);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], cfg.server.port));
     let listener = tokio::net::TcpListener::bind(addr).await?;
@@ -55,7 +59,7 @@ async fn main() -> Result<()> {
 
     tokio::join!(
         async {
-            if let Err(e) = run_consumer_loop(consumer, &topics, decoder, store).await {
+            if let Err(e) = run_consumer_loop(consumer, &topics, decoder, store, http_sender).await {
                 tracing::error!(error = %e, "Consumer loop exited with error");
             }
         },

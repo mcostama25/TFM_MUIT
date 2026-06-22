@@ -13,7 +13,12 @@ KUBERNETES/DataAccess/GraphQL/HTTPClient/config.toml
 KUBERNETES/DataSources/iceberg/hadoop/data_input
 
 # ── Build artifacts ───────────────────────────────────────────────────────────
-**/target/
+KUBERNETES/DataAccess/GraphQL/HTTPClient/target
+KUBERNETES/DataAccess/GraphQL/HTTPClient/Cargo.toml
+
+KUBERNETES/DataAccess/KafkaQueue/target
+KUBERNETES/DataAccess/KafkaQueue/config.toml
+DOCKER/ingestion/airflow/logs
 
 # ── Vendor / generated assets ─────────────────────────────────────────────────
 # Large minified Swagger UI files — serve from CDN instead

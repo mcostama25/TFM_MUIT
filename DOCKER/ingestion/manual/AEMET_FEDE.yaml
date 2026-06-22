@@ -1,6 +1,6 @@
 pipeline_name: AEMET_FEDE_Pipeline
 datahub_api:
-  server: "http://localhost:8082" # port de Localhost a GMS /Datahub1
+  server: "http://localhost:8080" # port de Localhost a GMS /Datahub1
   token: "datahub"
 source:
   type: datahub

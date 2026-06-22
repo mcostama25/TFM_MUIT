@@ -40,4 +40,4 @@ sink:
   type: datahub-rest
   config:
     server: "http://localhost:8081"  # GMS via port-forward
-    token: ""                        # si tens auth, posa-hi el token
+    token: "eyJhbGciOiJIUzI1NiJ9.eyJhY3RvclR5cGUiOiJVU0VSIiwiYWN0b3JJZCI6ImRhdGFodWIiLCJ0eXBlIjoiUEVSU09OQUwiLCJ2ZXJzaW9uIjoiMiIsImp0aSI6ImEzMmQ4NTNjLWMxNzMtNDFhNC04NTE4LWJkODUzZDI3NDVlZSIsInN1YiI6ImRhdGFodWIiLCJleHAiOjE3ODMxODU5ODYsImlzcyI6ImRhdGFodWItbWV0YWRhdGEtc2VydmljZSJ9.v1mEHQqFOzU9wPCFnJ4SqwVg7fdEjY2W6PVQ7cMifIU"

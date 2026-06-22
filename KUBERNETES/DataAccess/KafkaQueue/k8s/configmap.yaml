@@ -12,3 +12,5 @@ data:
   SCHEMA_REGISTRY__URL: "http://datahub-datahub-gms:8080"
   # Health probe port
   SERVER__PORT: "3001"
+  # DCAT3 HTTP server (host machine IP as seen from inside the VM)
+  HTTP_SENDER__SERVER_URL: "http://10.0.2.15:8080"

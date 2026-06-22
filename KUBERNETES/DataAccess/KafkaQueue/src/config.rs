@@ -8,6 +8,12 @@ pub struct AppConfig {
     pub schema_registry: SchemaRegistryConfig,
     pub server: ServerConfig,
     pub output: OutputConfig,
+    pub http_sender: HttpSenderConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct HttpSenderConfig {
+    pub server_url: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
